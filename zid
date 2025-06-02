@@ -10,7 +10,7 @@ then
     sudo pacman -S $package
 
 
-if [ $(yay -Si $package >/dev/null)  $? -eq 0 ]
+elif [ $(yay -Si $package >/dev/null)  $? -eq 0 ]
 then
     echo "running with yay..."
     yay -S $package

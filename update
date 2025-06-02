@@ -6,13 +6,24 @@
 # -u = Upgrade all installed packages.
 # -Syy = Forcefully download the package database for all repositories, even if it appears up to date.
 
+
+checkExitCode(){
+    if [ $? -eq 1 ]
+    then
+        echo -e "       -- \e[31m$1 \e[0m     --"
+        exit
+    else
+        echo "      -- the $1 run whitout error     -- "
+    fi
+}
+
+
 sudo pacman -Syu
+checkExitCode "(sudo pacman -Syu)"
 
-if [ $? -eq 1 ]
-then
-    echo -e "\e[31mError \e[0m"
-    echo "Using -Syyu..."
-    sudo pacman -Syyu
-fi
+yay -Syu
+checkExitCode "(yay -Syu)"
 
+sudo pacman -Sc
+checkExitCode "(sudo pacman -Sc)"
 
