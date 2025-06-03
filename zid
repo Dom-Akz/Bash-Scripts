@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# if the package is installed fetch for update
+# if there is no update do nothing
+
 package=$1
 
 sudo pacman -Si $package 2>/dev/null >/dev/null
