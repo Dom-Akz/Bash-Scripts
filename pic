@@ -1,0 +1,28 @@
+#!/bin/bash
+
+PATH="/home/soufiane/pics"
+# 19 and down to x is ngi
+# 18 and up to 05 is mr
+
+getImages(){
+    data=$(ls $PATH)
+    if [ -z $data ]
+    then
+        echo -e "\e[31mNo images \e[0m"
+        exit 1
+    fi
+    return $data
+}
+
+while true;
+do
+
+    currTime=$(date "+H")
+    if [ $currTime -lt 19 ]
+    then
+        feh 
+    else
+    fi
+
+done
+
