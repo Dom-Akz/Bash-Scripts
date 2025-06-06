@@ -1,28 +1,43 @@
 #!/bin/bash
 
-PATH="/home/soufiane/pics"
-# 19 and down to x is ngi
-# 18 and up to 05 is mr
+shopt -s nullglob
 
-getImages(){
-    data=$(ls $PATH)
-    if [ -z $data ]
-    then
-        echo -e "\e[31mNo images \e[0m"
-        exit 1
-    fi
-    return $data
+PATH="/home/soufiane/pics/"
+MOR_PATH="${PATH}mor/"
+NIG_PATH="${PATH}nig/"
+LAST_PIC="$HOME/.cache/pic-last.txt"
+
+
+is_mor(){
+    currTime=$(date "+%H")
+    [[ $currTime -lt 19 && $currTime -gt 5 ]]
+        
 }
 
 while true;
 do
-
-    currTime=$(date "+H")
-    if [ $currTime -lt 19 ]
-    then
-        feh 
+    if is_morning; then
+        IMG_DIR="$MOR_PATH"
+        PREFIX="mr"
     else
+        IMG_DIR="$NIG_PATH"
+        PREFIX="ng"
     fi
 
-done
+    # Get all matching images
+    files=("${IMG_DIR}${PREFIX}"*) 
 
+    # If files were found
+    if (( ${#files[@]} > 0 )); then
+        for img in "${files[@]}"; do
+            # Only change wallpaper if it's not already set
+            if [[ "$(cat $LAST_PIC 2>/dev/null)" != "$img" ]]; then
+                plasma-apply-wallpaperimage "$img"
+                echo "$img" > "$LAST_PIC"
+            fi
+            sleep 3600  # 1 hour delay between wallpaper changes
+        done
+    else
+        sleep 300
+    fi
+done
