@@ -5,7 +5,7 @@
 # -y = Refresh the package database (only if it's outdated).
 # -u = Upgrade all installed packages.
 # -Syy = Forcefully download the package database for all repositories, even if it appears up to date.
-
+# add the choice to run yay -Syu
 
 checkExitCode(){
     if [ $? -eq 1 ]

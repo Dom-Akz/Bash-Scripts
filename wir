@@ -5,7 +5,7 @@ local=$1
 
 if [ -z "$local" ]
 then
-    curlo=$(curl ipinfo.io/region)
+    curlo=$(curl ipinfo.io/region 2>/dev/null)
     curl wttr.in/$curlo?1
 else
     curl wttr.in/$local?1
