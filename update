@@ -7,23 +7,23 @@
 # -Syy = Forcefully download the package database for all repositories, even if it appears up to date.
 # add the choice to run yay -Syu
 
-checkExitCode(){
-    if [ $? -eq 1 ]
-    then
+check_ec(){
+    if [ $? -eq 1 ];then
         echo -e "       -- \e[31m$1 \e[0m     --"
         exit
-    else
-        echo "      -- the $1 run whitout error     -- "
     fi
 }
 
-
 sudo pacman -Syu
-checkExitCode "(sudo pacman -Syu)"
+check_ec
 
-yay -Syu
-checkExitCode "(yay -Syu)"
+Clean(){
+    yay -Syu
+    check_ec 
 
-sudo pacman -Sc
-checkExitCode "(sudo pacman -Sc)"
+    sudo pacman -Sc
+    check_ec 
+}
+
+
 
