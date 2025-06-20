@@ -15,15 +15,21 @@ check_ec(){
 }
 
 sudo pacman -Syu
-check_ec
+
 
 Clean(){
     yay -Syu
-    check_ec 
-
     sudo pacman -Sc
-    check_ec 
 }
 
+read -p "Clean the cache [y/n]:" ch
 
+case $ch in
+    [Yy]* )
+        Clean
+        ;;
+    * )
+        exit 
+        ;;
+esac
 
