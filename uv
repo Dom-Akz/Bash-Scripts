@@ -1,10 +1,18 @@
 #!/bin/bash
 
 
-curl -s "https://api.openuv.io/api/v1/uv?lat=33.5333&lng=-7.5833" \
-  -H "x-access-token: openuv-7c1arrmc4m8jk3-io" \
-| jq '.result | {uv: .uv, max_uv: .uv_max, max_time: .uv_max_time}'
 
+if [ -z "$1" ]
+then
+    curl -s "https://api.openuv.io/api/v1/uv?lat=33.5333&lng=-7.5833" \
+    -H "x-access-token: openuv-7c1arrmc4m8jk3-io" \
+    | jq '.result | {uv: .uv, max_uv: .uv_max, max_time: .uv_max_time}'
+else
 
+    curl -s "https://api.openuv.io/api/v1/uv?lat=33.5333&lng=-7.5833&dt=2025-06-26T$1:00:00Z" \
+       -H "x-access-token: openuv-7c1arrmc4m8jk3-io" \
+       | jq '.result | {uv: .uv, max_uv: .uv_max, max_time: .uv_max_time}'
+
+fi
 
 
