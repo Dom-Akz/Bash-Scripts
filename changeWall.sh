@@ -5,7 +5,7 @@ MR_WALL="$HOME/Pictures/Wallpapers/MR_WALL"
 NG_WALL="$HOME/Pictures/Wallpapers/NG_WALL"
 LIST_FILE="/tmp/wallpaper_list.txt"
 STATE_FILE="/tmp/wallpaper_state.txt"
-
+DEFAULT_IMG="$HOME/Pictures/WALL/fallback.jpg"
 
 timeofday(){
     local h=$(date +%H)
@@ -44,6 +44,10 @@ while true; do
     next_line=$((current_index + 1))
     IMG=$(sed -n "${next_line}p" "$LIST_FILE")
     echo "$((current_index + 1))" > "$STATE_FILE"
+    isExist=$(find "$WALL_DIR" -wholename "$IMG" | wc -l)
+    if [ "$isExist" -eq 0 ];then
+       IMG="$DEFAULT_IMG" 
+    fi
     bash "$SWITCH_SCRIPT" --image "$IMG" --mode dark --type auto >/dev/null 2>&1
-    sleep 400
+    sleep 300
 done
