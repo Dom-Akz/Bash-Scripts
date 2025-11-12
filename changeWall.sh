@@ -49,5 +49,5 @@ while true; do
        IMG="$DEFAULT_IMG" 
     fi
     bash "$SWITCH_SCRIPT" --image "$IMG" --mode dark --type auto >/dev/null 2>&1
-    sleep 300
+    sleep 400
 done
