@@ -21,5 +21,16 @@ bash "$SWITCH_SCRIPT" --image "$IMG_PATH" --mode dark --type auto >/dev/null 2>&
 
 echo "$EXEC_CMD" >"$FILE_PATH"
 
-sleep 5
-reboot
+read -p "reboot 0 or shutdown 1 : " ch
+
+case $ch in
+0)
+	reboot
+	;;
+1)
+	shutdown
+	;;
+*)
+	exit
+	;;
+esac
