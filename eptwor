@@ -1,0 +1,13 @@
+#!/bin/bash
+
+activework_space=$(hyprctl workspaces -j | jq ".[].id")
+
+set -- $activework_space
+
+wp=${!#}
+
+mv_wp=$((wp + 1))
+
+hyprctl dispatch workspace $mv_wp -q
+
+hyprctl notify 1 2000 0 "Workspace $mv_wp" -q
