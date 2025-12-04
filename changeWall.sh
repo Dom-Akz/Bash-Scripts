@@ -6,13 +6,31 @@ NG_WALL="$HOME/Pictures/Wallpapers/NG_WALL"
 LIST_FILE="/tmp/wallpaper_list.txt"
 STATE_FILE="/tmp/wallpaper_state.txt"
 DEFAULT_IMG="$HOME/Pictures/WALL/eqw.png"
+SM_WALL="$HOME/Pictures/Wallpapers/SM/"
+
+# only run one time
+LAT=$(curl -s https://ipinfo.io/loc | cut -d, -f1)
+LONG=$(curl -s https://ipinfo.io/loc | cut -d, -f2)
 
 timeofday() {
 	local h=$(date +%H)
-	if [ "$h" -ge 9 ] && [ "$h" -lt 19 ]; then
+	if [ "$h" -ge 9 ] && [ "$h" -lt 18 ]; then
 		echo "morning"
 	else
 		echo "night"
+	fi
+
+}
+
+isHot() {
+	deg=$(curl -s "https://api.open-meteo.com/v1/forecast?latitude=$LAT&longitude=$LONG&current=temperature_2m" |
+		grep -o '"temperature_2m":[0-9.\-]*' |
+		cut -d: -f2)
+	deg=$(printf "%.0f" "$deg")
+	if [ "$deg" -gt 10 ]; then
+		echo "sahd" # hot day
+	else
+		echo "lkaz" # it's freezing out here
 	fi
 }
 
@@ -26,18 +44,29 @@ init_wallpaper_list() {
 last_run=0
 WALL_DIR="$MR_WALL"
 while true; do
+
 	current_time=$(date +%s)
+
 	if [ $((current_time - last_run)) -ge 3600 ]; then
+
 		tm_day=$(timeofday)
+		whet=$(isHot)
 		last_run=$current_time
-		if [ "$tm_day" = "night" ] && [ "$WALL_DIR" != "$NG_WALL" ]; then
+
+		# it can't be hot at night now !!
+		if [ "$whet" = "shad" ]; then
+			WALL_DIR="$SM_WALL"
+			init_wallpaper_list "$WALL_DIR"
+		elif [ "$tm_day" = "night" ] && [ "$WALL_DIR" != "$NG_WALL" ]; then
 			WALL_DIR="$NG_WALL"
 			init_wallpaper_list "$WALL_DIR"
+
 		elif [ "$tm_day" = "morning" ] && [ "$WALL_DIR" != "$MR_WALL" ]; then
 			WALL_DIR="$MR_WALL"
 			init_wallpaper_list "$WALL_DIR"
 		fi
 	fi
+
 	current_index=$(cat "$STATE_FILE")
 	total_files=$(wc -l <"$LIST_FILE")
 	[ "$current_index" -ge "$total_files" ] && init_wallpaper_list "$WALL_DIR" && current_index=0

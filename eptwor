@@ -2,12 +2,12 @@
 
 activework_space=$(hyprctl workspaces -j | jq ".[].id")
 
-set -- $activework_space
+for val in $activework_space; do
+	mp=$((val + 1))
+	$(echo $activework_space | grep -qwc "$mp")
+	if [ $? -eq 1 ]; then
+		break
+	fi
+done
 
-wp=${!#}
-
-mv_wp=$((wp + 1))
-
-hyprctl dispatch workspace $mv_wp -q
-
-hyprctl notify 1 2000 0 "Workspace $mv_wp" -q
+hyprctl dispatch workspace "$mp" -q

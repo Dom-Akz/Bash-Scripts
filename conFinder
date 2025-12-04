@@ -1,0 +1,52 @@
+#!/bin/bash
+
+# list of static path to search in
+
+
+check_cm() {
+	$("$1" -h >/dev/null)
+	if [ $? -eq 0 ]; then
+		return
+	else
+		$("$1" --help >/dev/null)
+		if [ $? -eq 0 ]; then
+			return
+		else
+			exit 1
+		fi
+	fi
+}
+
+# return a list of path or empty string
+search(){
+	
+
+}
+
+main() {
+	if [ -z "$1" ]; then
+		exit 1
+	fi
+
+	check_cm $1
+
+	for dir in $DIR;do
+		$res=search "$dir"
+		if [ -z "$res" ];then
+			continue
+		else
+			echo "$res" >> "$LIST_CONF"
+		fi
+	done
+	
+	if file is empty echo message
+
+	else
+		echo -e "Possible location are : \n"
+		cat "$LIST_CONF"
+	fi
+
+	exit 0
+}
+
+main $1

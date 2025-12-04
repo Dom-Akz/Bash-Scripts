@@ -1,6 +1,6 @@
 #!/bin/bash
 
-FILE_PATH="$HOME/.config/hypr/custom/execs.conf"
+EXEC_PATH="$HOME/.config/hypr/custom/execs.conf"
 SWITCH_SCRIPT="$HOME/.config/quickshell/ii/scripts/colors/switchwall.sh"
 
 _exit() {
@@ -21,17 +21,17 @@ _exit() {
 
 # REVERSE VERSION :
 
-cat "$FILE_PATH" | grep -qE '#'
+cat "$EXEC_PATH" | grep -qE '#'
 
 if [ $? -eq 0 ]; then
 	# UNCOMMENT AND JUMP TO _exit funciotn :
-	sed -i '1s/^#//' "$FILE_PATH"
+	sed -i '1s/^#//' "$EXEC_PATH"
 	_exit
 fi
 
 # COMMENT THE exec-once COMMAND
 
-sed -i '1s/^/#/' "$FILE_PATH"
+sed -i '1s/^/#/' "$EXEC_PATH"
 
 # GET/SET THE PIC :
 
