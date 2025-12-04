@@ -1,8 +1,0 @@
-#!/bin/bash
-
-LAT=$(curl -s https://ipinfo.io/loc | cut -d, -f1)
-LONG=$(curl -s https://ipinfo.io/loc | cut -d, -f2)
-
-curl -s "https://api.open-meteo.com/v1/forecast?latitude=$LAT&longitude=$LONG&current=temperature_2m" |
-	grep -o '"temperature_2m":[0-9.\-]*' |
-	cut -d: -f2
