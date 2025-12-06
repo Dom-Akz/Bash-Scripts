@@ -27,7 +27,7 @@ isHot() {
 		grep -o '"temperature_2m":[0-9.\-]*' |
 		cut -d: -f2)
 	deg=$(printf "%.0f" "$deg")
-	if [ "$deg" -gt 10 ]; then
+	if [ "$deg" -gt 20 ]; then
 		echo "sahd" # hot day
 	else
 		echo "lkaz" # it's freezing out here
