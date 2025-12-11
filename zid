@@ -5,20 +5,21 @@
 
 package=$1
 
-sudo pacman -Si $package 2>/dev/null >/dev/null
+sudo pacman -Si "$package" 2>/dev/nul
 
-if [ $? -eq 0 ]
-then
-    echo "runnig with pacman..."
-    sudo pacman -S $package
-
-
-elif [ $(yay -Si $package >/dev/null)  $? -eq 0 ]
-then
-    echo "running with yay..."
-    yay -S $package
-else
-    echo -e "\e[31m$package dose not exist\e[0m"
+if [ $? -eq 0 ]; then
+	echo "runnig with pacman..."
+	sudo pacman -S "$package"
+	exit 0
 fi
 
+$(yay -Si "$package" 2>/dev/null)
 
+if [ $? -eq 0 ]; then
+	echo "running with yay..."
+	yay -S "$package"
+	exit 0
+else
+	echo -e "\e[31m "$package" dose not exist\e[0m"
+	exit 1
+fi

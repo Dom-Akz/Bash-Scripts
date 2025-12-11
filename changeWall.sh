@@ -5,7 +5,7 @@ MR_WALL="$HOME/Pictures/Wallpapers/MR_WALL"
 NG_WALL="$HOME/Pictures/Wallpapers/NG_WALL"
 LIST_FILE="/tmp/wallpaper_list.txt"
 STATE_FILE="/tmp/wallpaper_state.txt"
-DEFAULT_IMG="$HOME/Pictures/WALL/eqw.png"
+DEFAULT_IMG="$HOME/Pictures/WALL/sdpf.png"
 SM_WALL="$HOME/Pictures/Wallpapers/SM/"
 
 # only run one time
@@ -31,6 +31,18 @@ isHot() {
 		echo "sahd" # hot day
 	else
 		echo "lkaz" # it's freezing out here
+	fi
+}
+
+isRain() {
+	rain=$(curl -s "https://api.open-meteo.com/v1/forecast?latitude=$LAT&longitude=$LON&current=rain" |
+		grep -o '"rain":[0-9.]*' | cut -d: -f2)
+
+	[[ -z "$rain" ]] || [[ "$rain" == "null" ]] && echo "none"
+	if [ $(echo "$rain > 0" | bc -l 2>/dev/null) -eq 1 ]; then
+		echo "rain"
+	else
+		echo "no rain"
 	fi
 }
 
