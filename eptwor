@@ -1,6 +1,12 @@
 #!/bin/bash
 
-activework_space=$(hyprctl workspaces -j | jq ".[].id")
+activework_space=$(hyprctl workspaces -j | jq ".[].id") # output : 1 2 3 ...
+
+$(echo "$activework_space" | grep -qwc 1)
+if [ $? -eq 1 ]; then
+	hyprctl dispatch workspace 1 -q
+	exit 0
+fi
 
 for val in $activework_space; do
 	mp=$((val + 1))
@@ -11,3 +17,4 @@ for val in $activework_space; do
 done
 
 hyprctl dispatch workspace "$mp" -q
+exit 0

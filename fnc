@@ -22,6 +22,17 @@ check-cm() {
 
 main() {
 
+	restore="false"
+
+	while [ $# -gt 0 ]; do
+		case "$1" in
+		-r)
+			restore="true"
+			;;
+		*) ;;
+		esac
+	done
+
 	if [ -z "$1" ]; then
 		echo "no command provide"
 		exit 2
@@ -31,12 +42,14 @@ main() {
 	fi
 
 	# if file exists then must be not empty
-	if [ -f "$LIST_CONF" ]; then
+
+	if [ -f "$LIST_CONF" ] && [ "$restore" == "true" ]; then
 		echo -e "Aleardy have it (run -r to restore it)\nPossible location are :\n"
 		cat "$LIST_CONF"
 		exit 0
+	else
+		echo $(cat /dev/null) >>"$LIST_CONF"
 	fi
-
 	local can_create_file=false
 
 	for dir in "${DIR[@]}"; do
