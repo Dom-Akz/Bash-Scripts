@@ -1,6 +1,6 @@
 #!/bin/bash
 
-activework_space=$(hyprctl workspaces -j | jq ".[].id") # output : 1 2 3 ...
+activework_space=$(hyprctl workspaces -j | jq ".[].id" | sort) # output : 1 2 3 ...
 
 $(echo "$activework_space" | grep -qwc 1)
 if [ $? -eq 1 ]; then
