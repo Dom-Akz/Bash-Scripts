@@ -1,12 +1,17 @@
 #!/bin/bash
 
+# get date once
+date_=$(date +%d-%m-%y)
+
 SWITCH_SCRIPT="$HOME/.config/quickshell/ii/scripts/colors/switchwall.sh"
 MR_WALL="$HOME/Pictures/Wallpapers/MR_WALL"
 NG_WALL="$HOME/Pictures/Wallpapers/NG_WALL"
 LIST_FILE="/tmp/wallpaper_list.txt"
 STATE_FILE="/tmp/wallpaper_state.txt"
 DEFAULT_IMG="$HOME/Pictures/WALL/sdpf.png"
-SM_WALL="$HOME/Pictures/Wallpapers/SM/"
+SM_WALL="$HOME/Pictures/Wallpapers/SM"
+RAIN_WALL="$HOME/Pictures/Wallpapers/RAIN"
+LOG_="/tmp/chwall-$date_.log" # path to log file. every day it create new one.
 
 # only run one time
 LAT=$(curl -s https://ipinfo.io/loc | cut -d, -f1)
@@ -19,11 +24,10 @@ timeofday() {
 	else
 		echo "night"
 	fi
-
 }
 
 isHot() {
-	deg=$(curl -s "https://api.open-meteo.com/v1/forecast?latitude=$LAT&longitude=$LONG&current=temperature_2m" |
+	local deg=$(curl -s "https://api.open-meteo.com/v1/forecast?latitude=$LAT&longitude=$LONG&current=temperature_2m" |
 		grep -o '"temperature_2m":[0-9.\-]*' |
 		cut -d: -f2)
 	deg=$(printf "%.0f" "$deg")
@@ -35,14 +39,31 @@ isHot() {
 }
 
 isRain() {
-	rain=$(curl -s "https://api.open-meteo.com/v1/forecast?latitude=$LAT&longitude=$LON&current=rain" |
-		grep -o '"rain":[0-9.]*' | cut -d: -f2)
+	local rain=$(curl -s -f "https://api.open-meteo.com/v1/forecast?latitude=$LAT&longitude=$LONG&current=precipitation" |
+		grep -o '"precipitation":[0-9.]*' | cut -d: -f2)
 
-	[[ -z "$rain" ]] || [[ "$rain" == "null" ]] && echo "none"
-	if [ $(echo "$rain > 0" | bc -l 2>/dev/null) -eq 1 ]; then
+	if [[ -z "$rain" ]] || [[ "$rain" == "null" ]]; then
+		echo "null"
+	elif (($(echo "$rain > 0" | bc -l 2>/dev/null))); then
 		echo "rain"
 	else
 		echo "no rain"
+	fi
+}
+
+log-to-file() {
+	if [ -z "$1" ] || [ -z "$2" ]; then
+		echo -e "\n[$(date)]\n WARNING: no information was given" >>"$LOG_"
+	else
+		local dir="$1"
+		local curr_wall="$2"
+		local msg="SCRIPTS RUNNING WITH NO ERROR OR WARNING"
+		[ ! -z "$3" ] && msg="$3"
+
+		echo -e "\n[$(date)]\nWallpapers Directory:"$dir"
+			\nCurrent Wallpaper:"$curr_wall"
+			\nINFO:"$msg"
+			" >>"$LOG_"
 	fi
 }
 
@@ -63,16 +84,18 @@ while true; do
 
 		tm_day=$(timeofday)
 		whet=$(isHot)
+		rain=$(isRain)
 		last_run=$current_time
 
-		# it can't be hot at night now !!
-		if [ "$whet" = "shad" ]; then
+		if [ "$whet" == "shad" ]; then
 			WALL_DIR="$SM_WALL"
+			init_wallpaper_list "$WALL_DIR"
+		elif [ "$rain" = "rain" ]; then
+			WALL_DIR=$RAIN_WALL
 			init_wallpaper_list "$WALL_DIR"
 		elif [ "$tm_day" = "night" ] && [ "$WALL_DIR" != "$NG_WALL" ]; then
 			WALL_DIR="$NG_WALL"
 			init_wallpaper_list "$WALL_DIR"
-
 		elif [ "$tm_day" = "morning" ] && [ "$WALL_DIR" != "$MR_WALL" ]; then
 			WALL_DIR="$MR_WALL"
 			init_wallpaper_list "$WALL_DIR"
@@ -89,6 +112,7 @@ while true; do
 	if [ "$isExist" -eq 0 ]; then
 		IMG="$DEFAULT_IMG"
 	fi
+	log-to-file "$WALL_DIR" "$IMG"
 	bash "$SWITCH_SCRIPT" --image "$IMG" --mode dark --type auto >/dev/null 2>&1
-	sleep 400
+	sleep 350
 done
