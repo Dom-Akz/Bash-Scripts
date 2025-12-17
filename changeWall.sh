@@ -11,7 +11,7 @@ STATE_FILE="/tmp/wallpaper_state.txt"
 DEFAULT_IMG="$HOME/Pictures/WALL/sdpf.png"
 SM_WALL="$HOME/Pictures/Wallpapers/SM"
 RAIN_WALL="$HOME/Pictures/Wallpapers/RAIN"
-LOG_="/tmp/chwall-$date_.log" # path to log file. every day it create new one.
+LOG_="$HOME/.local/bin/wall-log/chwall-$date_.log" # path to log file. every day it create new one.
 
 # only run one time
 LAT=$(curl -s https://ipinfo.io/loc | cut -d, -f1)
@@ -39,7 +39,7 @@ isHot() {
 }
 
 isRain() {
-	local rain=$(curl -s -f "https://api.open-meteo.com/v1/forecast?latitude=$LAT&longitude=$LONG&current=precipitation" |
+	local rain=$(curl -s "https://api.open-meteo.com/v1/forecast?latitude=$LAT&longitude=$LONG&current=precipitation" |
 		grep -o '"precipitation":[0-9.]*' | cut -d: -f2)
 
 	if [[ -z "$rain" ]] || [[ "$rain" == "null" ]]; then

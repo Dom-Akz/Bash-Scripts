@@ -69,7 +69,6 @@ restore() {
 }
 
 main() {
-
 	# init :
 	can_restore=false
 	search_command=false
@@ -96,7 +95,7 @@ main() {
 
 	shift $((OPTIND - 1))
 	local com="$1"
-	local msg=""
+	local msg="Possible location are : "
 
 	if [ -z "$com" ]; then
 		echo "no command provide"
@@ -109,12 +108,16 @@ main() {
 	LIST_CONF="/tmp/cm_name:$com.txt"
 
 	if $can_restore; then
-		msg=$(restore "$com")
+		msg=$(restore)
 	else
 		if [ -f "$LIST_CONF" ]; then
 			print "Aleardy have it (run -r to restore it)\nPossible location are :"
 			exit 0
 		fi
+	fi
+
+	if $search_command; then
+
 	fi
 
 	get-files "$com"

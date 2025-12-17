@@ -1,3 +1,0 @@
-#!/bin/bash
-
-curl -s "https://wiki.archlinux.org/api.php?action=query&list=search&srsearch=hyprlandl%20package&format=json"
