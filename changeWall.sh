@@ -57,12 +57,16 @@ log-to-file() {
 	else
 		local dir="$1"
 		local curr_wall="$2"
+		local -n arr=$3 # using the original array
 		local msg="SCRIPTS RUNNING WITH NO ERROR OR WARNING"
-		[ ! -z "$3" ] && msg="$3"
+
+		if [ "${#arr[@]}" -gt 0 ]; then   # check if the array is not empty
+			msg=$(printf "%s\n" "${arr[@]}") # joined the array into a string
+		fi
 
 		echo -e "\n[$(date)]\nWallpapers Directory:"$dir"
 			\nCurrent Wallpaper:"$curr_wall"
-			\nINFO:"$msg"
+			\n$msg
 			" >>"$LOG_"
 	fi
 }
@@ -79,6 +83,7 @@ WALL_DIR="$MR_WALL"
 while true; do
 
 	current_time=$(date +%s)
+	info=()
 
 	if [ $((current_time - last_run)) -ge 3600 ]; then
 
@@ -111,8 +116,15 @@ while true; do
 	isExist=$(find "$WALL_DIR" -wholename "$IMG" | wc -l)
 	if [ "$isExist" -eq 0 ]; then
 		IMG="$DEFAULT_IMG"
+		info+=("Using Default Image: "$DEFAULT_IMG"")
 	fi
-	log-to-file "$WALL_DIR" "$IMG"
+
+	info+=("Total wallpapers: "$total_files" ") # never 0
+	next_wall=$(find "$WALL_DIR" -type f ! -name "$ING")
+	info+=("Upcoming wallpapers: "$next_wall" ")
+
+	log-to-file "$WALL_DIR" "$IMG" info # this call dose not create a copy so the function use the original array
 	bash "$SWITCH_SCRIPT" --image "$IMG" --mode dark --type auto >/dev/null 2>&1
 	sleep 350
+
 done
