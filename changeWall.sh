@@ -32,9 +32,9 @@ isHot() {
 		cut -d: -f2)
 	deg=$(printf "%.0f" "$deg")
 	if [ "$deg" -gt 20 ]; then
-		echo "sahd" # hot day
+		return 0 # hot day
 	else
-		echo "lkaz" # it's freezing out here
+		return 1 # it's freezing out here
 	fi
 }
 
@@ -45,9 +45,9 @@ isRain() {
 	if [[ -z "$rain" ]] || [[ "$rain" == "null" ]]; then
 		echo "null"
 	elif (($(echo "$rain > 0" | bc -l 2>/dev/null))); then
-		echo "rain"
+		return 0 # rain
 	else
-		echo "no rain"
+		return 1 # no rain
 	fi
 }
 
@@ -56,8 +56,9 @@ log-to-file() {
 		echo -e "\n[$(date)]\n WARNING: no information was given" >>"$LOG_"
 	else
 		local dir="$1"
-		local curr_wall="$2"
-		local -n arr=$3 # using the original array
+
+		local curr_wall="$2" # if the default wall
+		local -n arr=$3      # using the original array
 		local msg="SCRIPTS RUNNING WITH NO ERROR OR WARNING"
 
 		if [ "${#arr[@]}" -gt 0 ]; then   # check if the array is not empty
@@ -78,6 +79,7 @@ init_wallpaper_list() {
 
 [ ! -f "$LIST_FILE" ] || [ ! -s "$LIST_FILE" ] && init_wallpaper_list "$MR_WALL"
 
+run_time=$(ps aux | grep .local/bin/changeWall.sh | awk 'NR==1 {print $9}')
 last_run=0
 WALL_DIR="$MR_WALL"
 while true; do
@@ -92,10 +94,10 @@ while true; do
 		rain=$(isRain)
 		last_run=$current_time
 
-		if [ "$whet" == "shad" ]; then
+		if [ "$whet" -eq 0 ]; then
 			WALL_DIR="$SM_WALL"
 			init_wallpaper_list "$WALL_DIR"
-		elif [ "$rain" = "rain" ]; then
+		elif [ "$rain" -eq 0 ]; then
 			WALL_DIR=$RAIN_WALL
 			init_wallpaper_list "$WALL_DIR"
 		elif [ "$tm_day" = "night" ] && [ "$WALL_DIR" != "$NG_WALL" ]; then
@@ -119,9 +121,17 @@ while true; do
 		info+=("Using Default Image: "$DEFAULT_IMG"")
 	fi
 
-	info+=("Total wallpapers: "$total_files" ") # never 0
+	info+=("Total wallpapers: "$total_files" ")
 	next_wall=$(find "$WALL_DIR" -type f ! -name "$ING")
 	info+=("Upcoming wallpapers: "$next_wall" ")
+
+	if [ "$last_run" == "$current_time" ] && [ -z "$run_time" ]; then
+		info+=("The wallpapers directory Change in: "$(date +%H:%M)" ")
+	fi
+	if [ -n "$run_time" ]; then
+		info+=("Script start at: "$run_time" ")
+		run_time=""
+	fi
 
 	log-to-file "$WALL_DIR" "$IMG" info # this call dose not create a copy so the function use the original array
 	bash "$SWITCH_SCRIPT" --image "$IMG" --mode dark --type auto >/dev/null 2>&1

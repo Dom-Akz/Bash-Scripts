@@ -116,10 +116,6 @@ main() {
 		fi
 	fi
 
-	if $search_command; then
-
-	fi
-
 	get-files "$com"
 	print "$msg"
 

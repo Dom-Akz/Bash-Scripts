@@ -1,20 +1,25 @@
 #!/bin/bash
 
+# Simply move to the ! first !  not acitve workspace (no window open)
+
+# this take all the active workspaces id and sort them
 activework_space=$(hyprctl workspaces -j | jq ".[].id" | sort) # output : 1 2 3 ...
 
+# check if the first workspace is not active
 $(echo "$activework_space" | grep -qwc 1)
 if [ $? -eq 1 ]; then
-	hyprctl dispatch workspace 1 -q
+	hyprctl dispatch workspace 1 -q # move to workspace 1
 	exit 0
 fi
 
+# for each id we take id + 1 and see if the workspace not active
 for val in $activework_space; do
 	mp=$((val + 1))
-	$(echo $activework_space | grep -qwc "$mp")
-	if [ $? -eq 1 ]; then
+	$(echo $activework_space | grep -qwc "$mp") # test if the list have the id or not
+	if [ $? -eq 1 ]; then                       # if the id dose not exists
 		break
 	fi
 done
 
-hyprctl dispatch workspace "$mp" -q
+hyprctl dispatch workspace "$mp" -q # move to workspace with id $mp
 exit 0
