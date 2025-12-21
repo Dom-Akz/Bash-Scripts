@@ -30,6 +30,9 @@ isHot() {
 	local deg=$(curl -s "https://api.open-meteo.com/v1/forecast?latitude=$LAT&longitude=$LONG&current=temperature_2m" |
 		grep -o '"temperature_2m":[0-9.\-]*' |
 		cut -d: -f2)
+	if [ -z "$deg" ] || [ "$deg" == "null" ]; then
+		return 1
+	fi
 	deg=$(printf "%.0f" "$deg")
 	if [ "$deg" -gt 20 ]; then
 		return 0 # hot day
@@ -90,14 +93,12 @@ while true; do
 	if [ $((current_time - last_run)) -ge 3600 ]; then
 
 		tm_day=$(timeofday)
-		whet=$(isHot)
-		rain=$(isRain)
 		last_run=$current_time
 
-		if [ "$whet" -eq 0 ]; then
+		if isHot; then
 			WALL_DIR="$SM_WALL"
 			init_wallpaper_list "$WALL_DIR"
-		elif [ "$rain" -eq 0 ]; then
+		elif isRain; then
 			WALL_DIR=$RAIN_WALL
 			init_wallpaper_list "$WALL_DIR"
 		elif [ "$tm_day" = "night" ] && [ "$WALL_DIR" != "$NG_WALL" ]; then
