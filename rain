@@ -8,7 +8,7 @@ isRain() {
 
 	if [[ -z "$rain" ]] || [[ "$rain" == "null" ]]; then
 		echo "null"
-	elif (($(echo "$rain > 0.2" | bc -l 2>/dev/null))); then
+	elif (($(echo "$rain > 0.1" | bc -l 2>/dev/null))); then
 		echo "rain"
 	else
 		echo "no rain"

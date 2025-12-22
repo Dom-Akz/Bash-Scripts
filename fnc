@@ -30,7 +30,7 @@ print() {
 	fi
 }
 
-# get the config files and store them in a file :
+# get the config files and store them in a file (!this function can stop the script):
 get-files() {
 	local can_create_file=false
 	local com="$1"
@@ -48,8 +48,8 @@ get-files() {
 			echo "$res" >>"$LIST_CONF"
 		fi
 	done
-
-	if [[ ! -f "$LIST_CONF" ]]; then
+	# we can stop here if file is empty
+	if [[ ! -s "$LIST_CONF" ]]; then
 		echo "$com : No configurations files found"
 		exit 0
 	fi

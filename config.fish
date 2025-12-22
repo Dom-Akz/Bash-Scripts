@@ -6,6 +6,12 @@ function fish_prompt -d "Write out the prompt"
         (set_color $fish_color_cwd) (prompt_pwd) (set_color normal)
 end
 
+function lg
+    head -n $argv[1] /home/soufiane/.local/bin/wall-log/chwall-(date +%d-%m-%y).log
+end
+
+
+
 if status is-interactive # Commands to run in interactive sessions can go here
 
     # No greeting
@@ -22,12 +28,15 @@ if status is-interactive # Commands to run in interactive sessions can go here
     alias ls 'eza --icons'
     alias clear "printf '\033[2J\033[3J\033[1;1H'"
     alias q 'qs -c ii'
-    alias c 'clear'
-    alias C 'clear'
+    alias c 'clear;hyfetch'
+    alias C 'clear;hyfetch'
     alias nv 'nvim'
     alias l 'ls'
-
+        
     # pacman and yay : 
+    alias update 'sudo pacman -Syu'
+    alias ycl 'yay -Syu'
+    alias pcl 'sudo pacman -Sc'
     alias addp 'sudo pacman -S'
     alias addy 'yay -S'
     alias delp 'sudo pacman -R'
@@ -39,6 +48,7 @@ if status is-interactive # Commands to run in interactive sessions can go here
     alias meta 'curl wttr.in/'
     alias suns 'curl wttr.in\?format="%s"' # sunset
 
+    
 
     # yt-dlp : 
     alias ytvd 'yt-dlp -t mp4 -o "Videos/%(title)s.%(ext)s" --no-keep-video'

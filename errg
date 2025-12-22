@@ -1,0 +1,11 @@
+#!/bin/bash
+
+SWITCH_SCRIPT="$HOME/.config/quickshell/ii/scripts/colors/switchwall.sh"
+IMG_PATH="$HOME/Pictures/Wallpapers/Wall/wall2.png"
+
+pkill -9 changeWall.sh 2>/dev/null
+if [ $? -eq 1 ]; then
+	exit 0
+fi
+
+bash "$SWITCH_SCRIPT" --image "$IMG_PATH" --mode dark --type auto >/dev/null 2>&1

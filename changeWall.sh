@@ -11,6 +11,7 @@ STATE_FILE="/tmp/wallpaper_state.txt"
 DEFAULT_IMG="$HOME/Pictures/WALL/sdpf.png"
 SM_WALL="$HOME/Pictures/Wallpapers/SM"
 RAIN_WALL="$HOME/Pictures/Wallpapers/RAIN"
+VID_WALL="$HOME/Pictures/Wallpapers/VID_WALL/"
 LOG_="$HOME/.local/bin/wall-log/chwall-$date_.log" # path to log file. every day it create new one.
 
 # only run one time
@@ -34,7 +35,7 @@ isHot() {
 		return 1
 	fi
 	deg=$(printf "%.0f" "$deg")
-	if [ "$deg" -gt 20 ]; then
+	if [ $deg -gt 20 ]; then
 		return 0 # hot day
 	else
 		return 1 # it's freezing out here
@@ -56,7 +57,7 @@ isRain() {
 
 log-to-file() {
 	if [ -z "$1" ] || [ -z "$2" ]; then
-		echo -e "\n[$(date)]\n WARNING: no information was given" >>"$LOG_"
+		echo -e "\n[$(date)]\n WARNING: no information was given" >>$LOG_
 	else
 		local dir="$1"
 
@@ -68,9 +69,7 @@ log-to-file() {
 			msg=$(printf "%s\n" "${arr[@]}") # joined the array into a string
 		fi
 
-		echo -e "\n[$(date)]\nWallpapers Directory:"$dir"
-			\nCurrent Wallpaper:"$curr_wall"
-			\n$msg
+		echo -e "[$(date)]\nWallpapers Directory:"$dir"\nCurrent Wallpaper:"$curr_wall"\n$msg
 			" >>"$LOG_"
 	fi
 }
@@ -80,7 +79,7 @@ init_wallpaper_list() {
 	echo "0" >"$STATE_FILE"
 }
 
-[ ! -f "$LIST_FILE" ] || [ ! -s "$LIST_FILE" ] && init_wallpaper_list "$MR_WALL"
+[ ! -f "$LIST_FILE" ] || [ ! -s "$LIST_FILE" ] && init_wallpaper_list $MR_WALL
 
 run_time=$(ps aux | grep .local/bin/changeWall.sh | awk 'NR==1 {print $9}')
 last_run=0
@@ -97,45 +96,42 @@ while true; do
 
 		if isHot; then
 			WALL_DIR="$SM_WALL"
-			init_wallpaper_list "$WALL_DIR"
+			init_wallpaper_list $WALL_DIR
 		elif isRain; then
-			WALL_DIR=$RAIN_WALL
-			init_wallpaper_list "$WALL_DIR"
+			WALL_DIR="$RAIN_WALL"
+			init_wallpaper_list $WALL_DIR
 		elif [ "$tm_day" = "night" ] && [ "$WALL_DIR" != "$NG_WALL" ]; then
 			WALL_DIR="$NG_WALL"
-			init_wallpaper_list "$WALL_DIR"
+			init_wallpaper_list $WALL_DIR
 		elif [ "$tm_day" = "morning" ] && [ "$WALL_DIR" != "$MR_WALL" ]; then
 			WALL_DIR="$MR_WALL"
-			init_wallpaper_list "$WALL_DIR"
+			init_wallpaper_list $WALL_DIR
 		fi
 	fi
 
 	current_index=$(cat "$STATE_FILE")
 	total_files=$(wc -l <"$LIST_FILE")
-	[ "$current_index" -ge "$total_files" ] && init_wallpaper_list "$WALL_DIR" && current_index=0
+	[ "$current_index" -ge "$total_files" ] && init_wallpaper_list $WALL_DIR && current_index=0
 	next_line=$((current_index + 1))
 	IMG=$(sed -n "${next_line}p" "$LIST_FILE")
 	echo "$((current_index + 1))" >"$STATE_FILE"
-	isExist=$(find "$WALL_DIR" -wholename "$IMG" | wc -l)
-	if [ "$isExist" -eq 0 ]; then
+	wall_exists=$(find $WALL_DIR -wholename "$IMG" | wc -l)
+	if [ "$wall_exists" -eq 0 ]; then
 		IMG="$DEFAULT_IMG"
-		info+=("Using Default Image: "$DEFAULT_IMG"")
+		info+=("Using default image: $DEFAULT_IMG")
 	fi
 
-	info+=("Total wallpapers: "$total_files" ")
-	next_wall=$(find "$WALL_DIR" -type f ! -name "$ING")
-	info+=("Upcoming wallpapers: "$next_wall" ")
-
+	info+=("Total wallpapers: $total_files")
 	if [ "$last_run" == "$current_time" ] && [ -z "$run_time" ]; then
-		info+=("The wallpapers directory Change in: "$(date +%H:%M)" ")
+		info+=("New wallpaper directory: "$(date +%H:%M)"")
 	fi
 	if [ -n "$run_time" ]; then
-		info+=("Script start at: "$run_time" ")
+		info+=("Start runnig at: $run_time")
 		run_time=""
 	fi
 
-	log-to-file "$WALL_DIR" "$IMG" info # this call dose not create a copy so the function use the original array
-	bash "$SWITCH_SCRIPT" --image "$IMG" --mode dark --type auto >/dev/null 2>&1
+	log-to-file $WALL_DIR $IMG info # this call dose not create a copy so the function use the original array
+	bash $SWITCH_SCRIPT --image $IMG --mode dark --type auto >/dev/null 2>&1
 	sleep 350
 
 done
