@@ -1,10 +1,13 @@
 #!/bin/bash
 
+# whether its daemon has the real config
+
 # list ofpath to search in dotfiles
 DIR=("$HOME/.config/"
 	"$HOME/"
+	"$HOME/.local/share/"
 	"/etc/"
-	"/usr/share/" # themes
+	"/usr/share/"
 )
 
 LIST_CONF=""
@@ -41,11 +44,11 @@ get-files() {
 		else
 			if $can_create_file; then
 				can_create_file=true # one time
-				lc=$(touch "$LIST_CONF" /dev/null 2>&1)
+				lc=$(touch $LIST_CONF /dev/null 2>&1)
 				[ $? -ne 0 ] && echo "$lc" && exit 2 # in case any error
 			fi
 
-			echo "$res" >>"$LIST_CONF"
+			echo "$res" >>$LIST_CONFi
 		fi
 	done
 	# we can stop here if file is empty
@@ -61,11 +64,20 @@ usage() {
 
 restore() {
 	if [ -f "$LIST_CONF" ]; then
-		rm "$LIST_CONF" 2>/dev/null # delete the file and in get_files function will be recrated
+		rm "$LIST_CONF" 2>/dev/null # delete the file and in get_files function will be created
 		echo "File restored successfully."
 	else
 		echo "Warning: file not found. Nothing has been restored."
 	fi
+}
+
+# get the pacakge name from the command and search with the package name insted
+sch-com() {
+	# pacakage=$(pacman -Qo $(which <cmd>))
+	# if the owner is the same as the command then stop and just use the get_files function
+	# res=$(pacman -Ql $package | grep /etc or /usr/share or '.conf')
+	#
+	echo ""
 }
 
 main() {
@@ -100,12 +112,21 @@ main() {
 	if [ -z "$com" ]; then
 		echo "no command provide"
 		exit 2
+	fi
+
+	# -rc : check if file exisit befor calling sch-com
+
+	if $search_command; then # no need to check the command
+		list=$(sch-com "$com")
+		if [ -n "$list" ]; then
+			print "$list"
+		fi
 	else
 		check-cm "$com"
 	fi
 
 	# set file name :
-	LIST_CONF="/tmp/cm_name:$com.txt"
+	LIST_CONF="/tmp/cm_name:$com.fnc"
 
 	if $can_restore; then
 		msg=$(restore)

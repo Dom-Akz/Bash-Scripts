@@ -63,7 +63,7 @@ log-to-file() {
 
 		local curr_wall="$2" # if the default wall
 		local -n arr=$3      # using the original array
-		local msg="SCRIPTS RUNNING WITH NO ERROR OR WARNING"
+		local msg="ERROR:NO MESSAGES WAS FOUND"
 
 		if [ "${#arr[@]}" -gt 0 ]; then   # check if the array is not empty
 			msg=$(printf "%s\n" "${arr[@]}") # joined the array into a string
