@@ -114,7 +114,7 @@ main() {
 		exit 2
 	fi
 
-	# -rc : check if file exisit befor calling sch-com
+	# -rc : check if file exisit before calling sch-com
 
 	if $search_command; then # no need to check the command
 		list=$(sch-com "$com")
