@@ -48,7 +48,7 @@ get-files() {
 				[ $? -ne 0 ] && echo "$lc" && exit 2 # in case any error
 			fi
 
-			echo "$res" >>$LIST_CONFi
+			echo "$res" >>$LIST_CONF
 		fi
 	done
 	# we can stop here if file is empty
@@ -60,6 +60,9 @@ get-files() {
 
 usage() {
 	echo "Usage : fnc [options] command"
+	echo "-h : disply help"
+	echo "-r : restore the configuration files to a file"
+	echo "-c : deep search for configurations files"
 }
 
 restore() {

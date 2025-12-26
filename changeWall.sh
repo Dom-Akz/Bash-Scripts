@@ -19,8 +19,8 @@ LAT=$(curl -s https://ipinfo.io/loc | cut -d, -f1)
 LONG=$(curl -s https://ipinfo.io/loc | cut -d, -f2)
 
 timeofday() {
-	local h=$(date +%H)
-	if [ "$h" -ge 9 ] && [ "$h" -lt 18 ]; then
+	local h=$(date +%H:%M)
+	if [ "$h" == "09:00" ] && [ "$h" == "18:30" ]; then
 		echo "morning"
 	else
 		echo "night"
