@@ -7,7 +7,7 @@ function fish_prompt -d "Write out the prompt"
 end
 
 function lg
-    head -n $argv[1] /home/soufiane/.local/bin/wall-log/chwall-(date +%d-%m-%y).log
+    tail -n $argv[1] /home/soufiane/.local/bin/wall-log/chwall-(date +%d-%m-%y).log
 end
 
 
@@ -28,10 +28,11 @@ if status is-interactive # Commands to run in interactive sessions can go here
     alias ls 'eza --icons'
     alias clear "printf '\033[2J\033[3J\033[1;1H'"
     alias q 'qs -c ii'
-    alias c 'clear;hyfetch'
-    alias C 'clear;hyfetch'
+    alias c 'clear'
+    alias C 'clear'
     alias nv 'nvim'
     alias l 'ls'
+    alias clean 'find .local/bin/wall-log -type f ! -name "chwall-$(date +%d-%m-%y).log" -delete'
         
     # pacman and yay : 
     alias update 'sudo pacman -Syu'
