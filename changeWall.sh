@@ -19,8 +19,8 @@ LAT=$(curl -s https://ipinfo.io/loc | cut -d, -f1)
 LONG=$(curl -s https://ipinfo.io/loc | cut -d, -f2)
 
 timeofday() {
-	local h=$(date +%H:%M)
-	if [ "$h" == "09:00" ] && [ "$h" == "18:30" ]; then
+	local h=$(date +%H)
+	if [ "$h" -gt 9 ] && [ "$h" -lt 18 ]; then
 		echo "morning"
 	else
 		echo "night"
@@ -79,7 +79,7 @@ init_wallpaper_list() {
 	echo "0" >"$STATE_FILE"
 }
 
-[ ! -f "$LIST_FILE" ] || [ ! -s "$LIST_FILE" ] && init_wallpaper_list $MR_WALL
+[ ! -f "$LIST_FILE" ] || [ ! -s "$LIST_FILE" ] && init_wallpaper_list "$MR_WALL"
 
 run_time=$(ps aux | grep .local/bin/changeWall.sh | awk 'NR==1 {print $9}')
 last_run=0
@@ -96,26 +96,26 @@ while true; do
 
 		if isHot; then
 			WALL_DIR="$SM_WALL"
-			init_wallpaper_list $WALL_DIR
+			init_wallpaper_list "$WALL_DIR"
 		elif isRain; then
 			WALL_DIR="$RAIN_WALL"
-			init_wallpaper_list $WALL_DIR
+			init_wallpaper_list "$WALL_DIR"
 		elif [ "$tm_day" = "night" ] && [ "$WALL_DIR" != "$NG_WALL" ]; then
 			WALL_DIR="$NG_WALL"
-			init_wallpaper_list $WALL_DIR
+			init_wallpaper_list "$WALL_DIR"
 		elif [ "$tm_day" = "morning" ] && [ "$WALL_DIR" != "$MR_WALL" ]; then
 			WALL_DIR="$MR_WALL"
-			init_wallpaper_list $WALL_DIR
+			init_wallpaper_list "$WALL_DIR"
 		fi
 	fi
 
 	current_index=$(cat "$STATE_FILE")
 	total_files=$(wc -l <"$LIST_FILE")
-	[ "$current_index" -ge "$total_files" ] && init_wallpaper_list $WALL_DIR && current_index=0
+	[ "$current_index" -ge "$total_files" ] && init_wallpaper_list "$WALL_DIR" && current_index=0
 	next_line=$((current_index + 1))
 	IMG=$(sed -n "${next_line}p" "$LIST_FILE")
 	echo "$((current_index + 1))" >"$STATE_FILE"
-	wall_exists=$(find $WALL_DIR -wholename "$IMG" | wc -l)
+	wall_exists=$(find "$WALL_DIR" -wholename "$IMG" | wc -l)
 	if [ "$wall_exists" -eq 0 ]; then
 		IMG="$DEFAULT_IMG"
 		info+=("Using default image: $DEFAULT_IMG")
@@ -130,8 +130,8 @@ while true; do
 		run_time=""
 	fi
 
-	log-to-file $WALL_DIR $IMG info # this call dose not create a copy so the function use the original array
-	bash $SWITCH_SCRIPT --image $IMG --mode dark --type auto >/dev/null 2>&1
+	log-to-file "$WALL_DIR" "$IMG" info # this call dose not create a copy so the function use the original array
+	bash $SWITCH_SCRIPT --image "$IMG" --mode dark --type auto >/dev/null 2>&1
 	sleep 350
 
 done
