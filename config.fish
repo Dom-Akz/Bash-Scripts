@@ -32,7 +32,7 @@ if status is-interactive # Commands to run in interactive sessions can go here
     alias C 'clear'
     alias nv 'nvim'
     alias l 'ls'
-    alias clean 'find ~/.local/bin/wall-log -type f ! -name "chwall-$(date +%d-%m-%y).log" -delete'
+    alias clean 'find ~/.local/share/chwall/ -type f ! -name "chwall-$(date +%d-%m-%y).log" -delete'
         
     # pacman and yay : 
     alias update 'sudo pacman -Syu'

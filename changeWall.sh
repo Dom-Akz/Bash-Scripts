@@ -12,7 +12,7 @@ DEFAULT_IMG="$HOME/Pictures/WALL/sdpf.png"
 SM_WALL="$HOME/Pictures/Wallpapers/SM"
 RAIN_WALL="$HOME/Pictures/Wallpapers/RAIN"
 VID_WALL="$HOME/Pictures/Wallpapers/VID_WALL/"
-LOG_="$HOME/.local/bin/wall-log/chwall-$date_.log" # path to log file. every day it create new one.
+LOG_="$HOME/.local/share/chwall/chwall-$date_.log" # path to log file. every day it create new one.
 
 # only run one time
 LAT=$(curl -s https://ipinfo.io/loc | cut -d, -f1)
@@ -20,7 +20,7 @@ LONG=$(curl -s https://ipinfo.io/loc | cut -d, -f2)
 
 timeofday() {
 	local h=$(date +%H)
-	if [ "$h" -gt 9 ] && [ "$h" -lt 18 ]; then
+	if [ "$h" -gt 8 ] && [ "$h" -lt 18 ]; then
 		echo "morning"
 	else
 		echo "night"

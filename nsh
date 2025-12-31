@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# create a executable bash script
+# with option -n : open script in vim (use the same session)
+
 can_open=false
 
 while getopts "nh" opt; do

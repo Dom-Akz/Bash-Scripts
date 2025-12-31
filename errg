@@ -1,9 +1,10 @@
 #!/bin/bash
 
 SWITCH_SCRIPT="$HOME/.config/quickshell/ii/scripts/colors/switchwall.sh"
-IMG_PATH="$HOME/Pictures/Wallpapers/Wall/wall2.png"
+IMG_PATH="$HOME/Pictures/WALL/0anime9.jpg"
 
 pkill -9 changeWall.sh 2>/dev/null
+# check if the script was not runing
 if [ $? -eq 1 ]; then
 	exit 0
 fi
