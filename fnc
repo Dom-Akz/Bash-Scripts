@@ -29,7 +29,7 @@ print() {
 	else
 		[[ ! -z "$1" ]] && echo -e "$1"
 		head -n 20 "$LIST_CONF" 2>/dev/null
-		echo -e "\nto see more files locations go to $LIST_CONF"
+		echo -e "\nsee more: $LIST_CONF"
 	fi
 }
 

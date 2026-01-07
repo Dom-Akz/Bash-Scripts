@@ -1,1 +1,1 @@
-Useless Bash Script That i use every day
+Useless Bash Scripts That i use every day
