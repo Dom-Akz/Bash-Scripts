@@ -1,0 +1,56 @@
+#!/bin/bash
+
+# yt-dlp --dump-json "$URL" | jq '.chapters':
+# return a json : { start_time, title (chapter), end_time}
+
+# options :
+# -a : downloads all chapters (skip the choice part)
+# -o : audio only (the defautl will be video)
+# -f : specifique location (default is Videos/ or Music/)
+
+# get all chapter -> list the name of each one
+# get the choice from user -> downloads files
+
+usage() {
+	echo -e "usage : yt-dch [options] url"
+	echo -e "\t-h : display help"
+	echo -e "\t-a : downloads all chapters"
+	echo -e "\t-o : downloads audio file"
+	echo -e "\t-f : output location"
+}
+
+main() {
+	download_all=false
+	audio=false
+	location=false
+
+	while getopts "aofh" opt; do
+		case "$opt" in
+		a)
+			download_all=true
+			;;
+		o)
+			audio=true
+			;;
+		f)
+			location=true
+			;;
+		h)
+			usage
+			exit 0
+			;;
+		\*)
+			echo "invalid option -$opt"
+			usage
+			exit 1
+			;;
+		esac
+	done
+
+	shift $((OPTIND - 1))
+
+	#wait # wait for all downloads to complete.
+	exit 0
+}
+
+main "$@"
