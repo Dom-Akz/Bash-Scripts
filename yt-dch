@@ -11,6 +11,11 @@
 # get all chapter -> list the name of each one
 # get the choice from user -> downloads files
 
+print_chapters() {
+	local url="$1"
+
+}
+
 usage() {
 	echo -e "usage : yt-dch [options] url"
 	echo -e "\t-h : display help"
@@ -46,6 +51,13 @@ main() {
 			;;
 		esac
 	done
+
+	if [ -z "$1" ]; then
+		echo -e "no url was given\nrun -h to see the usage"
+		exit 1
+	fi
+
+	print_chapters "$1"
 
 	shift $((OPTIND - 1))
 
