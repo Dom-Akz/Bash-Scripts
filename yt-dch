@@ -11,9 +11,23 @@
 # get all chapter -> list the name of each one
 # get the choice from user -> downloads files
 
+JSON_DATA="/tmp/out-yt-dch.json"
+# in case the user run the command with the same url
+# json have the urls and for each url we store chapiters titles.
+CACHE_URLS="/tmp/urls-yt-dch.json"
+
 print_chapters() {
 	local url="$1"
+	# get all video data and extract the title only from chapters:
+	$(yt-dlp --dump-json "$url" >"$JSON_DATA")
+	[[ $? -eq 1 ]] && exit 1
+	echo -e "All chapiters : "
+	cat $JSON_DATA | jq -r ".chapters[].title"
+	# here is the caching of urls (if url already exits just overwriter it):
+	jq --arg url "$url" '{url: $url, titles: [.chapters[].title]}' \
+		"$JSON_DATA" >>"$CACHE_URLS"
 
+	rm "$JSON_DATA" # don't need the file anymore.
 }
 
 usage() {
