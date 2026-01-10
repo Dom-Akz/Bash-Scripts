@@ -16,18 +16,48 @@ JSON_DATA="/tmp/out-yt-dch.json"
 # json have the urls and for each url we store chapiters titles.
 CACHE_URLS="/tmp/urls-yt-dch.json"
 
-print_chapters() {
-	local url="$1"
-	# get all video data and extract the title only from chapters:
-	$(yt-dlp --dump-json "$url" >"$JSON_DATA")
-	[[ $? -eq 1 ]] && exit 1
-	echo -e "All chapiters : "
-	cat $JSON_DATA | jq -r ".chapters[].title"
-	# here is the caching of urls (if url already exits just overwriter it):
-	jq --arg url "$url" '{url: $url, titles: [.chapters[].title]}' \
-		"$JSON_DATA" >>"$CACHE_URLS"
+# this is a helper function : check if url aleady exist in CACHE_URLS
+# !should not print titles!
 
-	rm "$JSON_DATA" # don't need the file anymore.
+#init-files(){}
+
+get-chapters-cache() {
+	local url="$1"
+	# get all urls in file and see if there is any match.
+	$(jq '.url' "$CACHE_URLS" | grep -qwc "$url")
+	if [ $? -eq 0 ]; then
+		local data=$(
+			jq --arg url "$url" 'select(.url == $url) | .titles' "$CACHE_URLS"
+		)
+		echo "$data"
+	else
+		echo ""
+	fi
+}
+
+print-chapters() {
+	local url="$1"
+	local msg="All chapiters : "
+
+	# call the helper function to check if url aleadry exist :
+	local res=$(get-chapters-cache "$url")
+
+	if [ ! -z "$res" ] || [ "$res" != "null" ]; then
+		echo -e "$msg\n$res " # the url already exist and we can just print it.
+	else
+		# get all video data and extract the title only from chapters:
+		$(yt-dlp --dump-json "$url" >"$JSON_DATA")
+		[[ $? -eq 1 ]] && exit 1
+
+		# TODO : in canse there is no chapters in video:
+		jq -r ".chapters[].title" $JSON_DATA 2>/dev/null
+
+		# here is the caching of urls (if url already exits just overwriter it):
+		jq --arg url "$url" '{url: $url, titles: [.chapters[].title]}' \
+			"$JSON_DATA" >>"$CACHE_URLS"
+
+		rm "$JSON_DATA" # don't need the file anymore.
+	fi
 }
 
 usage() {
@@ -42,6 +72,8 @@ main() {
 	download_all=false
 	audio=false
 	location=false
+	# create cache file
+	touch $CACHE_URLS 2>/dev/null
 
 	while getopts "aofh" opt; do
 		case "$opt" in
@@ -71,7 +103,7 @@ main() {
 		exit 1
 	fi
 
-	print_chapters "$1"
+	print-chapters "$1"
 
 	shift $((OPTIND - 1))
 
