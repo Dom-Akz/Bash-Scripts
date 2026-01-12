@@ -38,11 +38,12 @@ get-chapters-cache() {
 print-chapters() {
 	local url="$1"
 	local msg="All chapiters : "
+	local res=""
 
 	# call the helper function to check if url aleadry exist :
-	local res=$(get-chapters-cache "$url")
+	res=$(get-chapters-cache "$url")
 
-	if [ ! -z "$res" ] || [ "$res" != "null" ]; then
+	if [ ! -z "$res" ]; then
 		echo -e "$msg\n$res " # the url already exist and we can just print it.
 	else
 		# get all video data and extract the title only from chapters:
@@ -50,6 +51,7 @@ print-chapters() {
 		[[ $? -eq 1 ]] && exit 1
 
 		# TODO : in canse there is no chapters in video:
+		echo $msg
 		jq -r ".chapters[].title" $JSON_DATA 2>/dev/null
 
 		# here is the caching of urls (if url already exits just overwriter it):
