@@ -73,16 +73,15 @@ usage() {
 	echo -e "\t-f : output location"
 }
 
+# TODO: if the given number is all files and the totales files match.
 get-wtd() {
 	local i=3
 	local res=-1
-	local t_files=$(
-		cat /tmp/urls-yt-dch.json | jq --raw-output0 '.titles' | wc -l
-	)
+	local t_files=$(cat /tmp/urls-yt-dch.json | jq --raw-output0 '.titles' | wc -l)
 
-	while [[ $i -eq 0 ]]; do
+	while [[ $i -ne 0 ]]; do
 		read -p "Enter the number :" res
-		if [ $res -lt $t_files ] && [ $res -gt 0 ]; then
+		if [ $res -le $t_files ] && [ $res -gt 0 ]; then
 			break
 		fi
 		i=$((i - 1))
@@ -96,9 +95,27 @@ get-wtd() {
 }
 
 download() {
+	# init :
 	local url="$1"
-	shift
+	local nb_file="$2"
+	local path=""
+	local ad_arg=""
+	local w_td=""
+	# basic conditions :
+	if [ ! -z $4 ]; then
+		ad_arg="$4"
+	fi
+	if [ ! -z $3 ]; then
+		path="$3""/%(title)s.%(ext)s"
+	fi
+	# start the downloads :
 
+	if [ $nb_file -ne 0 ]; then
+		w_td="--download-sections 0-$nb_file"
+	fi
+
+	# !! download the files yaaaa :
+	yt-dlp --split-chapters $w_td $ad_arg $path $url
 }
 
 main() {
@@ -139,7 +156,8 @@ main() {
 	fi
 
 	local url="$1"
-	local nb_files=-1 # how much chapters to downloads
+	local nb_files=0 # how much chapters to downloads
+	local ad_arg=""
 
 	print-chapters $url # exit 1
 
@@ -148,14 +166,16 @@ main() {
 	# mute the f flag. move all files if f exist.
 
 	if ! $download_all; then
-		nb_file=$(get-wtd) # exit 1
+		nb_files=$(get-wtd) # exit 1
+	fi
+
+	if $audio; then
+		ad_arg="-x --audio-format mp3 --audio-quality 0"
 	fi
 
 	# this where the downloads happens
 
-	download $url $nb_file $location $audio # exit 1
-
-	#wait # wait for all downloads to complete.
+	download $url $nb_files $path $ad_arg # exit 1
 	exit 0
 }
 
