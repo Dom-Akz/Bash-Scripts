@@ -7,15 +7,21 @@ function fish_prompt -d "Write out the prompt"
 end
 
 function lg
-    tail -n $argv[1] /home/soufiane/.local/bin/wall-log/chwall-(date +%d-%m-%y).log
+    tail -n $argv[1] /home/soufiane/.local/share/chwall//chwall-(date +%d-%m-%y).log
 end
 
+function ldir
+    if test -z $argv[1]
+        find . -type d
+    else
+        find $argv[1] -type d
+    end
+end
 
+if status is-interactive
 
-if status is-interactive # Commands to run in interactive sessions can go here
-
-    # No greeting
     set fish_greeting
+
     hyfetch
     # Use starship
     starship init fish | source
@@ -28,12 +34,13 @@ if status is-interactive # Commands to run in interactive sessions can go here
     alias ls 'eza --icons'
     alias clear "printf '\033[2J\033[3J\033[1;1H'"
     alias q 'qs -c ii'
-    alias c 'clear'
-    alias C 'clear'
+    alias c 'clear;hyfetch'
+    alias C 'clear;hyfetch'
     alias nv 'nvim'
     alias l 'ls'
     alias clean 'find ~/.local/share/chwall/ -type f ! -name "chwall-$(date +%d-%m-%y).log" -delete'
-        
+
+
     # pacman and yay : 
     alias update 'sudo pacman -Syu'
     alias ycl 'yay -Syu'
@@ -42,7 +49,7 @@ if status is-interactive # Commands to run in interactive sessions can go here
     alias addy 'yay -S'
     alias delp 'sudo pacman -R'
     alias dely 'yay -R'
-
+   
     # weahter alias :
     
     alias met 'curl wttr.in?format=3'

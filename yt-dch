@@ -19,7 +19,11 @@ CACHE_URLS="/tmp/urls-yt-dch.json"
 # this is a helper function : check if url aleady exist in CACHE_URLS
 # !should not print titles!
 
-#init-files(){}
+init-files() {
+	if [ ! -f "$CACHE_URLS" ]; then
+		touch $CACHE_URLS 2>/dev/null
+	fi
+}
 
 get-chapters-cache() {
 	local url="$1"
@@ -37,21 +41,20 @@ get-chapters-cache() {
 
 print-chapters() {
 	local url="$1"
-	local msg="All chapiters : "
 	local res=""
 
 	# call the helper function to check if url aleadry exist :
 	res=$(get-chapters-cache "$url")
 
 	if [ ! -z "$res" ]; then
-		echo -e "$msg\n$res " # the url already exist and we can just print it.
+		echo -e "All chaipters\n$res " # the url already exist and we can just print it.
 	else
 		# get all video data and extract the title only from chapters:
 		$(yt-dlp --dump-json "$url" >"$JSON_DATA")
 		[[ $? -eq 1 ]] && exit 1
 
 		# TODO : in canse there is no chapters in video:
-		echo $msg
+		echo "All chapiters"
 		jq -r ".chapters[].title" $JSON_DATA 2>/dev/null
 
 		# here is the caching of urls (if url already exits just overwriter it):
@@ -70,14 +73,42 @@ usage() {
 	echo -e "\t-f : output location"
 }
 
+get-wtd() {
+	local i=3
+	local res=-1
+	local t_files=$(
+		cat /tmp/urls-yt-dch.json | jq --raw-output0 '.titles' | wc -l
+	)
+
+	while [[ $i -eq 0 ]]; do
+		read -p "Enter the number :" res
+		if [ $res -lt $t_files ] && [ $res -gt 0 ]; then
+			break
+		fi
+		i=$((i - 1))
+	done
+	if [ $res -eq -1 ]; then
+		echo "Error: Invalid chapters number"
+		exit 1
+	else
+		echo "$res"
+	fi
+}
+
+download() {
+	local url="$1"
+	shift
+
+}
+
 main() {
 	download_all=false
 	audio=false
 	location=false
-	# create cache file
-	touch $CACHE_URLS 2>/dev/null
+	path=""
+	init-files # create cache url file
 
-	while getopts "aofh" opt; do
+	while getopts "aof:h" opt; do
 		case "$opt" in
 		a)
 			download_all=true
@@ -87,6 +118,7 @@ main() {
 			;;
 		f)
 			location=true
+			path="$OPTARG"
 			;;
 		h)
 			usage
@@ -100,14 +132,28 @@ main() {
 		esac
 	done
 
+	shift $((OPTIND - 1))
 	if [ -z "$1" ]; then
 		echo -e "no url was given\nrun -h to see the usage"
 		exit 1
 	fi
 
-	print-chapters "$1"
+	local url="$1"
+	local nb_files=-1 # how much chapters to downloads
 
-	shift $((OPTIND - 1))
+	print-chapters $url # exit 1
+
+	# [a , ao, af, aof , o, of, f ] i did not now any better way to do this :)
+	# 2 function (download, download-audio)
+	# mute the f flag. move all files if f exist.
+
+	if ! $download_all; then
+		nb_file=$(get-wtd) # exit 1
+	fi
+
+	# this where the downloads happens
+
+	download $url $nb_file $location $audio # exit 1
 
 	#wait # wait for all downloads to complete.
 	exit 0
