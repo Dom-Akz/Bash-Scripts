@@ -25,6 +25,7 @@ init-files() {
 	fi
 }
 
+# take url and search in CACHE_URLS file for it
 get-chapters-cache() {
 	local url="$1"
 	# get all urls in file and see if there is any match.
@@ -49,7 +50,7 @@ print-chapters() {
 	if [ ! -z "$res" ]; then
 		echo -e "All chaipters\n$res " # the url already exist and we can just print it.
 	else
-		# get all video data and extract the title only from chapters:
+		# get all video data and extract the title of each chapter:
 		$(yt-dlp --dump-json "$url" >"$JSON_DATA")
 		[[ $? -eq 1 ]] && exit 1
 
@@ -73,49 +74,26 @@ usage() {
 	echo -e "\t-f : output location"
 }
 
-# TODO: if the given number is all files and the totales files match.
+# get the user input return the number of chapters you want to download
 get-wtd() {
 	local i=3
-	local res=-1
+	local f=false # flag
 	local t_files=$(cat /tmp/urls-yt-dch.json | jq --raw-output0 '.titles' | wc -l)
 
 	while [[ $i -ne 0 ]]; do
-		read -p "Enter the number :" res
+		read -p "Chose a number(1-$t_files):" res
 		if [ $res -le $t_files ] && [ $res -gt 0 ]; then
+			f=true # the input given is valid
 			break
 		fi
 		i=$((i - 1))
 	done
-	if [ $res -eq -1 ]; then
+	if ! $f; then
 		echo "Error: Invalid chapters number"
 		exit 1
 	else
 		echo "$res"
 	fi
-}
-
-download() {
-	# init :
-	local url="$1"
-	local nb_file="$2"
-	local path=""
-	local ad_arg=""
-	local w_td=""
-	# basic conditions :
-	if [ ! -z $4 ]; then
-		ad_arg="$4"
-	fi
-	if [ ! -z $3 ]; then
-		path="$3""/%(title)s.%(ext)s"
-	fi
-	# start the downloads :
-
-	if [ $nb_file -ne 0 ]; then
-		w_td="--download-sections 0-$nb_file"
-	fi
-
-	# !! download the files yaaaa :
-	yt-dlp --split-chapters $w_td $ad_arg $path $url
 }
 
 main() {
@@ -135,7 +113,7 @@ main() {
 			;;
 		f)
 			location=true
-			path="$OPTARG"
+			path="$OPTARG""/%(title)s.%(ext)s"
 			;;
 		h)
 			usage
@@ -157,16 +135,13 @@ main() {
 
 	local url="$1"
 	local nb_files=0 # how much chapters to downloads
-	local ad_arg=""
-
+	local ad_arg=""  # audio arguments
+	local w_td=""
 	print-chapters $url # exit 1
 
-	# [a , ao, af, aof , o, of, f ] i did not now any better way to do this :)
-	# 2 function (download, download-audio)
-	# mute the f flag. move all files if f exist.
-
 	if ! $download_all; then
-		nb_files=$(get-wtd) # exit 1
+		nb_files=$(get-wtd)                   # exit 1
+		w_td="--download-sections 0-$nb_file" # this dose not work
 	fi
 
 	if $audio; then
@@ -175,7 +150,8 @@ main() {
 
 	# this where the downloads happens
 
-	download $url $nb_files $path $ad_arg # exit 1
+	yt-dlp --split-chapters $w_td $ad_arg $path $url # exit 1
+
 	exit 0
 }
 
