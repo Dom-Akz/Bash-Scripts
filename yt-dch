@@ -16,6 +16,9 @@ JSON_DATA="/tmp/out-yt-dch.json"
 # json have the urls and for each url we store chapiters titles.
 CACHE_URLS="/tmp/urls-yt-dch.json"
 
+# TODO: !! TRY TO CHANGE THIS !!
+ALL_CH_NAME="/tmp/all_titles.txt"
+
 # this is a helper function : check if url aleady exist in CACHE_URLS
 # !should not print titles!
 
@@ -39,6 +42,17 @@ get-chapters-cache() {
 		echo ""
 	fi
 }
+cache() {
+	local url="$1"
+
+	jq --arg url "$url" '{url: $url, titles: [.chapters[].title]}' \
+		"$JSON_DATA" >>"$CACHE_URLS"
+
+	cat $CACHE_URLS | jq -r '(.titles[] | "- \('.')")' >$ALL_CH_NAME
+
+	rm "$JSON_DATA" # don'
+
+}
 
 print-chapters() {
 	local url="$1"
@@ -59,10 +73,7 @@ print-chapters() {
 		jq -r ".chapters[].title" $JSON_DATA 2>/dev/null
 
 		# here is the caching of urls (if url already exits just overwriter it):
-		jq --arg url "$url" '{url: $url, titles: [.chapters[].title]}' \
-			"$JSON_DATA" >>"$CACHE_URLS"
-
-		rm "$JSON_DATA" # don't need the file anymore.
+		cache $url
 	fi
 }
 
@@ -75,15 +86,17 @@ usage() {
 }
 
 # get the user input return the number of chapters you want to download
-get-wtd() {
+# TODO: !! add multiple chapiter at once !!
+# get name bu number
+get-ch-name() {
 	local i=3
 	local f=false # flag
-	local t_files=$(cat /tmp/urls-yt-dch.json | jq --raw-output0 '.titles' | wc -l)
-
+	local t_ch=$(cat $ALL_CH_NAME | wc -l)
 	while [[ $i -ne 0 ]]; do
-		read -p "Chose a number(1-$t_files):" res
-		if [ $res -le $t_files ] && [ $res -gt 0 ]; then
+		read -p "Chose a number(1-$t_ch):" res
+		if [ $res -le $t_ch ] && [ $res -gt 0 ]; then
 			f=true # the input given is valid
+			ch_name=$(grep "^-[[:space:]]*$res " $ALL_CH_NAME)
 			break
 		fi
 		i=$((i - 1))
@@ -92,7 +105,7 @@ get-wtd() {
 		echo "Error: Invalid chapters number"
 		exit 1
 	else
-		echo "$res"
+		echo $ch_name
 	fi
 }
 
@@ -113,7 +126,7 @@ main() {
 			;;
 		f)
 			location=true
-			path="$OPTARG""/%(title)s.%(ext)s"
+			path="-o""$OPTARG""/%(title)s.%(ext)s"
 			;;
 		h)
 			usage
@@ -140,8 +153,9 @@ main() {
 	print-chapters $url # exit 1
 
 	if ! $download_all; then
-		nb_files=$(get-wtd)                   # exit 1
-		w_td="--download-sections 0-$nb_file" # this dose not work
+		name=$(get-ch-name) # exit 1
+		echo $name
+		w_td="--download-sections $name"
 	fi
 
 	if $audio; then
@@ -150,7 +164,7 @@ main() {
 
 	# this where the downloads happens
 
-	yt-dlp --split-chapters $w_td $ad_arg $path $url # exit 1
+	yt-dlp $path $ad_arg --split-chapters $w_td $url # exit 1
 
 	exit 0
 }
