@@ -35,7 +35,7 @@ get-chapters-cache() {
 	$(jq '.url' "$CACHE_URLS" | grep -qwc "$url")
 	if [ $? -eq 0 ]; then
 		local data=$(
-			jq --arg url "$url" 'select(.url == $url) | .titles' "$CACHE_URLS"
+			jq -r --arg url "$url" 'select(.url == $url) | .titles' "$CACHE_URLS"
 		)
 		echo "$data"
 	else
@@ -48,9 +48,9 @@ cache() {
 	jq --arg url "$url" '{url: $url, titles: [.chapters[].title]}' \
 		"$JSON_DATA" >>"$CACHE_URLS"
 
-	cat $CACHE_URLS | jq -r '(.titles[] | "- \('.')")' >$ALL_CH_NAME
+	cat $CACHE_URLS | jq -r --arg url "$url" 'select(.url ==$url) | .titles[] | "- \('.')"' >$ALL_CH_NAME
 
-	rm "$JSON_DATA" # don'
+	rm "$JSON_DATA"
 
 }
 
@@ -68,7 +68,6 @@ print-chapters() {
 		$(yt-dlp --dump-json "$url" >"$JSON_DATA")
 		[[ $? -eq 1 ]] && exit 1
 
-		# TODO : in canse there is no chapters in video:
 		echo "All chapiters"
 		jq -r ".chapters[].title" $JSON_DATA 2>/dev/null
 
