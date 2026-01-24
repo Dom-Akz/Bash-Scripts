@@ -16,7 +16,7 @@ JSON_DATA="/tmp/out-yt-dch.json"
 # json have the urls and for each url we store chapiters titles.
 CACHE_URLS="/tmp/urls-yt-dch.json"
 
-# TODO: !! TRY TO CHANGE THIS !!
+# script liftime (overwrite each time this script run)
 ALL_CH_NAME="/tmp/all_titles.txt"
 
 # this is a helper function : check if url aleady exist in CACHE_URLS
@@ -28,52 +28,28 @@ init-files() {
 	fi
 }
 
-# take url and search in CACHE_URLS file for it
-get-chapters-cache() {
-	local url="$1"
-	# get all urls in file and see if there is any match.
-	$(jq '.url' "$CACHE_URLS" | grep -qwc "$url")
-	if [ $? -eq 0 ]; then
-		local data=$(
-			jq -r --arg url "$url" 'select(.url == $url) | .titles' "$CACHE_URLS"
-		)
-		echo "$data"
-	else
-		echo ""
-	fi
+# delete the tmp files and terminat the script
+_exit() {
+	rm "$JSON_DATA" 2>/dev/null
+	exit $1
 }
+
+# Get the chapiter from the url
+# Cache the url with title
+# Create a tmp file contian the chapiters titles for the current url
 cache() {
 	local url="$1"
 
-	jq --arg url "$url" '{url: $url, titles: [.chapters[].title]}' \
-		"$JSON_DATA" >>"$CACHE_URLS"
-
-	cat $CACHE_URLS | jq -r --arg url "$url" 'select(.url ==$url) | .titles[] | "- \('.')"' >$ALL_CH_NAME
-
-	rm "$JSON_DATA"
-
-}
-
-print-chapters() {
-	local url="$1"
-	local res=""
-
-	# call the helper function to check if url aleadry exist :
-	res=$(get-chapters-cache "$url")
-
-	if [ ! -z "$res" ]; then
-		echo -e "All chaipters\n$res " # the url already exist and we can just print it.
-	else
-		# get all video data and extract the title of each chapter:
+	$(jq '.url' "$CACHE_URLS" | grep -qwc "$url")
+	if [ $? -eq 1 ]; then
 		$(yt-dlp --dump-json "$url" >"$JSON_DATA")
-		[[ $? -eq 1 ]] && exit 1
-
-		echo "All chapiters"
-		jq -r ".chapters[].title" $JSON_DATA 2>/dev/null
-
-		# here is the caching of urls (if url already exits just overwriter it):
-		cache $url
+		[[ $? -eq 1 ]] && _exit 1
+		# url cache (json)
+		jq --arg url "$url" '{url: $url, titles: [.chapters[].title]}' \
+			"$JSON_DATA" >>"$CACHE_URLS"
 	fi
+	# tmp file store titles
+	cat $CACHE_URLS | jq -r --arg url "$url" 'select(.url ==$url) | .titles[] | "- \('.')"' >$ALL_CH_NAME
 }
 
 usage() {
@@ -102,18 +78,16 @@ get-ch-name() {
 	done
 	if ! $f; then
 		echo "Error: Invalid chapters number"
-		exit 1
+		_exit 1
 	else
-		echo $ch_name
+		echo "$ch_name"
 	fi
 }
 
 main() {
 	download_all=false
 	audio=false
-	location=false
 	path=""
-	init-files # create cache url file
 
 	while getopts "aof:h" opt; do
 		case "$opt" in
@@ -124,7 +98,6 @@ main() {
 			audio=true
 			;;
 		f)
-			location=true
 			path="-o""$OPTARG""/%(title)s.%(ext)s"
 			;;
 		h)
@@ -146,15 +119,21 @@ main() {
 	fi
 
 	local url="$1"
-	local nb_files=0 # how much chapters to downloads
-	local ad_arg=""  # audio arguments
-	local w_td=""
-	print-chapters $url # exit 1
+	local name=""   # how much chapters to downloads
+	local ad_arg="" # audio arguments
+	local w_td="--split-chapters"
+
+	init-files
+
+	cache $url
+
+	# print all chapiter to the screen:
+	cat $ALL_CH_NAME
 
 	if ! $download_all; then
-		name=$(get-ch-name) # exit 1
-		echo $name
-		w_td="--download-sections $name"
+		name=$(get-ch-name)
+		echo $name # exit 1
+		w_td="--download-sections "$name""
 	fi
 
 	if $audio; then
@@ -162,10 +141,9 @@ main() {
 	fi
 
 	# this where the downloads happens
+	yt-dlp $path $ad_arg $w_td $url # exit 1
 
-	yt-dlp $path $ad_arg --split-chapters $w_td $url # exit 1
-
-	exit 0
+	_exit 0
 }
 
 main "$@"
