@@ -1,8 +1,6 @@
 #!/bin/bash
 
-# whether its daemon has the real config
-
-# list ofpath to search in dotfiles
+# list of paths to search for conf files
 DIR=("$HOME/.config/"
 	"$HOME/"
 	"$HOME/.local/share/"
@@ -12,6 +10,7 @@ DIR=("$HOME/.config/"
 
 LIST_CONF=""
 
+# check if command line is valid (exists) or not
 check-cm() {
 	if type -P "$1" >/dev/null 2>&1; then
 		return
@@ -23,11 +22,12 @@ check-cm() {
 
 print() {
 	local nb=$(cat "$LIST_CONF" | wc -l)
+	local msg=$1
+
+	echo -e "$1"
 	if [ "$nb" -lt 21 ]; then
-		[[ ! -z "$1" ]] && echo -e "$1"
 		cat "$LIST_CONF" 2>/dev/null
 	else
-		[[ ! -z "$1" ]] && echo -e "$1"
 		head -n 20 "$LIST_CONF" 2>/dev/null
 		echo -e "\nsee more: $LIST_CONF"
 	fi
@@ -67,20 +67,11 @@ usage() {
 
 restore() {
 	if [ -f "$LIST_CONF" ]; then
-		rm "$LIST_CONF" 2>/dev/null # delete the file and in get_files function will be created
+		rm "$LIST_CONF" 2>/dev/null # delete the file and in get_files function it will be created
 		echo "File restored successfully."
 	else
 		echo "Warning: file not found. Nothing has been restored."
 	fi
-}
-
-# get the pacakge name from the command and search with the package name insted
-sch-com() {
-	# pacakage=$(pacman -Qo $(which <cmd>))
-	# if the owner is the same as the command then stop and just use the get_files function
-	# res=$(pacman -Ql $package | grep /etc or /usr/share or '.conf')
-	#
-	echo ""
 }
 
 main() {
@@ -110,7 +101,7 @@ main() {
 
 	shift $((OPTIND - 1))
 	local com="$1"
-	local msg="Possible location are : "
+	local msg="Possible locations are:"
 
 	if [ -z "$com" ]; then
 		echo "no command provide"
@@ -119,12 +110,7 @@ main() {
 
 	# -rc : check if file exisit before calling sch-com
 
-	if $search_command; then # no need to check the command
-		list=$(sch-com "$com")
-		if [ -n "$list" ]; then
-			print "$list"
-		fi
-	else
+	if ! $search_command; then # no need to check the command
 		check-cm "$com"
 	fi
 
@@ -135,7 +121,7 @@ main() {
 		msg=$(restore)
 	else
 		if [ -f "$LIST_CONF" ]; then
-			print "Aleardy have it (run -r to restore it)\nPossible location are :"
+			print "Aleardy have it (run -r to restore it)\n$msg"
 			exit 0
 		fi
 	fi
