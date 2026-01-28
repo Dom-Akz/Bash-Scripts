@@ -64,7 +64,7 @@ usage() {
 # get the user input return the number of chapters you want to download
 # TODO: !! add multiple chapiter at once using the timestamps!!
 # get name bu number
-get-ch-timestamps() {
+get-ch-name() {
 	local i=3
 	local f=false # flag
 	local t_ch=$(cat $ALL_CH_NAME | wc -l)
@@ -72,7 +72,7 @@ get-ch-timestamps() {
 		read -p "Chose a number(1-$t_ch):" res
 		if [ $res -le $t_ch ] && [ $res -gt 0 ]; then
 			f=true # the input given is valid
-			ch_name=$(grep "^-[[:space:]]*$res " $ALL_CH_NAME)
+			ch_name=$(sed -n "${res}s/^- //p" $ALL_CH_NAME)
 			break
 		fi
 		i=$((i - 1))
@@ -99,7 +99,7 @@ main() {
 			audio=true
 			;;
 		f)
-			path="-o""$OPTARG""/%(title)s.%(ext)s"
+			path="-o ""$OPTARG""/%(title)s.%(ext)s"
 			;;
 		h)
 			usage
@@ -132,14 +132,13 @@ main() {
 
 	if ! $download_all; then
 		name=$(get-ch-name)
-		echo $name # exit 1
-		w_td="--download-sections "$name""
+		w_td="--download-sections *${name}*"
 	fi
 
 	if $audio; then
 		ad_arg="-x --audio-format mp3 --audio-quality 0"
 	fi
-
+	echo $path $ad_arg $w_td $url
 	# this where the downloads happens
 	yt-dlp $path $ad_arg $w_td $url # exit 1
 
