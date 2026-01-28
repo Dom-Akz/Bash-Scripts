@@ -93,7 +93,7 @@ while true; do
 
 		tm_day=$(timeofday)
 		last_run=$current_time
-
+		info+=("Api call now next call in: $(date -d '+1 hour' +'%H:%M')")
 		if isHot; then
 			WALL_DIR="$SM_WALL"
 			init_wallpaper_list "$WALL_DIR"
