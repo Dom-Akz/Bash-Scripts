@@ -108,9 +108,7 @@ main() {
 		exit 2
 	fi
 
-	# -rc : check if file exisit before calling sch-com
-
-	if ! $search_command; then # no need to check the command
+	if ! $search_command; then
 		check-cm "$com"
 	fi
 
