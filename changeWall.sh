@@ -28,7 +28,7 @@ timeofday() {
 }
 
 isHot() {
-	local deg=$(curl -s "https://api.open-meteo.com/v1/forecast?latitude=$LAT&longitude=$LONG&current=temperature_2m" |
+	local deg=$(curl -s --connect-timeout 10 --max-time 10 "https://api.open-meteo.com/v1/forecast?latitude=$LAT&longitude=$LONG&current=temperature_2m" |
 		grep -o '"temperature_2m":[0-9.\-]*' |
 		cut -d: -f2)
 	if [ -z "$deg" ] || [ "$deg" == "null" ]; then
@@ -43,7 +43,7 @@ isHot() {
 }
 
 isRain() {
-	local rain=$(curl -s "https://api.open-meteo.com/v1/forecast?latitude=$LAT&longitude=$LONG&current=precipitation" |
+	local rain=$(curl -s --connect-timeout 10 --max-time 10 "https://api.open-meteo.com/v1/forecast?latitude=$LAT&longitude=$LONG&current=precipitation" |
 		grep -o '"precipitation":[0-9.]*' | cut -d: -f2)
 
 	if [[ -z "$rain" ]] || [[ "$rain" == "null" ]]; then
