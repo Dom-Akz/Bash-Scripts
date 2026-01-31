@@ -47,7 +47,7 @@ isRain() {
 		grep -o '"precipitation":[0-9.]*' | cut -d: -f2)
 
 	if [[ -z "$rain" ]] || [[ "$rain" == "null" ]]; then
-		echo "null"
+		return 1
 	elif (($(echo "$rain > 0" | bc -l 2>/dev/null))); then
 		return 0 # rain
 	else
