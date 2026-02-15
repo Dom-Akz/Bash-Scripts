@@ -63,7 +63,7 @@ usage() {
 
 # get the user input return the number of chapters you want to download
 # TODO: !! add multiple chapiter at once using the timestamps!!
-# get name bu number
+# get name by number
 get-ch-name() {
 	local i=3
 	local f=false # flag

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SWITCH_SCRIPT="$HOME/.config/quickshell/ii/scripts/colors/switchwall.sh"
-IMG_PATH="/$HOME/Pictures/WALL/sdpf.png"
+IMG_PATH="/$HOME/Pictures/WALL/anime_skull.png"
 
 pkill -9 changeWall.sh 2>/dev/null
 # check if the script was not runing

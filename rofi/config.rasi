@@ -1,0 +1,43 @@
+@theme "~/.config/rofi/themes/nova-dark.rasi"
+@import "~/.cache/wal/colors-rofi-dark.rasi"
+configuration {
+    modi: "drun,run";
+    show-icons: true;
+    font: "JetBrains Mono Nerd Font 12";
+}
+* {
+    background: transparent;
+}
+window {
+    background-image: url("/home/soufiane/Pictures/Pannini,_Giovanni_Paolo.jpg", both);
+    background-color: rgba(30, 30, 46, 0.7);
+    border-radius: 12px;
+    padding: 20px;
+    width: 50%;
+    height: 60%;
+    location: center;
+}
+inputbar {
+    background-color: rgba(24, 24, 37, 0.4);
+    border-radius: 8px;
+    padding: 12px;
+    margin: 0 0 15px 0;
+}
+entry {
+    background-color: transparent;
+    text-color: #cdd6f4;
+}
+listview {
+    lines: 10;
+    dynamic: true;
+}
+element {
+  padding: 8px;
+  border-radius: 6px;
+  text-color: #cdd6f4;
+}
+element selected {
+   background-color: #b8935c;
+   text-color: #1a1510;
+
+}
