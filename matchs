@@ -1,2 +1,3 @@
-#!/bin/bash 
- echo 'script matchs created' 
+#!/bin/env bash
+
+echo 'skdfj'

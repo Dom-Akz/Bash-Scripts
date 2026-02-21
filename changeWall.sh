@@ -35,7 +35,7 @@ isHot() {
 		return 1
 	fi
 	deg=$(printf "%.0f" "$deg")
-	if [ $deg -gt 22 ]; then
+	if [ $deg -gt 20 ]; then
 		return 0 # hot day
 	else
 		return 1 # it's freezing out here
