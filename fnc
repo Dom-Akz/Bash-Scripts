@@ -26,9 +26,9 @@ print() {
 
 	echo -e "$1"
 	if [ "$nb" -lt 21 ]; then
-		cat "$LIST_CONF" 2>/dev/null | bat --file-name "$LIST_CONF"
+		cat "$LIST_CONF" 2>/dev/null | bat -l txt --file-name "$LIST_CONF"
 	else
-		head -n 20 "$LIST_CONF" 2>/dev/null | bat --file-name "$LIST_CONF"
+		head -n 20 "$LIST_CONF" 2>/dev/null | bat -l txt --file-name "$LIST_CONF"
 		echo -e "\nsee more: $LIST_CONF"
 	fi
 }
