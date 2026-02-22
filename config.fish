@@ -7,16 +7,14 @@ function fish_prompt -d "Write out the prompt"
 end
 
 function lg
-    tail -n $argv[1] /home/soufiane/.local/share/chwall//chwall-(date +%d-%m-%y).log
+    set filename Wallpapers-(date +%d-%m-%y).log 
+    tail -n $argv[1] /home/soufiane/.local/share/chwall//$filename | bat -l log --file-name "$filename"
 end
 
-function ldir
-    if test -z $argv[1]
-        find . -type d
-    else
-        find $argv[1] -type d
-    end
+function showpass
+   nmcli connection show $argv[1] -s | grep -m 1 "802-11-wireless-security.psk" | awk '{print $NF}' 
 end
+
 
 if status is-interactive
 
@@ -38,7 +36,7 @@ if status is-interactive
     alias C 'clear;hyfetch'
     alias nv 'nvim'
     alias l 'ls'
-    alias clean 'find ~/.local/share/chwall/ -type f ! -name "chwall-$(date +%d-%m-%y).log" -delete'
+    #alias clean 'find ~/.local/share/chwall/ -type f ! -name "Wallpapers-$(date +%d-%m-%y).log" -delete'
 
 
     # pacman and yay : 
