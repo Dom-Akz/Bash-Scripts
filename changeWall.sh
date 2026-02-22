@@ -12,7 +12,7 @@ DEFAULT_IMG="$HOME/Pictures/WALL/anime_skull.png" # add check if the img exist o
 SM_WALL="$HOME/Pictures/Wallpapers/SM"
 RAIN_WALL="$HOME/Pictures/Wallpapers/RAIN"
 VID_WALL="$HOME/Pictures/Wallpapers/VID_WALL/"
-LOG_="$HOME/.local/share/chwall/chwall-$date_.log" # path to log file. every day it create new one.
+LOG_="$HOME/.local/share/chwall/Wallpapers-$date_.log" # path to log file. every day it create new one.
 
 # only run one time
 LAT=$(curl -s https://ipinfo.io/loc | cut -d, -f1)
