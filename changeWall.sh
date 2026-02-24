@@ -93,6 +93,7 @@ while true; do
 
 		tm_day=$(timeofday)
 		last_run=$current_time
+		tmp_walldir="$WALL_DIR"
 		info+=("Api call now next call in: $(date -d '+1 hour' +'%H:%M')")
 		if isHot; then
 			WALL_DIR="$SM_WALL"
@@ -107,6 +108,7 @@ while true; do
 			WALL_DIR="$MR_WALL"
 			init_wallpaper_list "$WALL_DIR"
 		fi
+		[[ "$tmp_walldir" != "$WALL_DIR" ]] && info+=("New wallpaper directory: "$(date +%H:%M)"")
 	fi
 
 	current_index=$(cat "$STATE_FILE")
@@ -122,9 +124,6 @@ while true; do
 	fi
 
 	info+=("Total wallpapers: $total_files")
-	if [ "$last_run" == "$current_time" ] && [ -z "$run_time" ]; then
-		info+=("New wallpaper directory: "$(date +%H:%M)"")
-	fi
 	if [ -n "$run_time" ]; then
 		info+=("Start runnig at: $run_time")
 		run_time=""
