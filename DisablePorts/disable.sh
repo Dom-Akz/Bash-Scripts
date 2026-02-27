@@ -22,13 +22,9 @@ disable-hdmi() {
 	return 1
 }
 
-#TODO:
-#disable-audio() {}
-
 main() {
 
 	#com=$(lspci | grep -E "USB|Audio|VGA|HDMI|Display|Ethernet|Network|Thunderbolt|FireWire|IEEE 1394|Serial Port|Parallel Port|eSATA|Card Reader|Modem|Bluetooth|WiFi|WLAN|Graphics|3D|Video")
-
 	disable-usb
 
 	disable-hdmi
