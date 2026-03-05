@@ -3,6 +3,7 @@ import platform
 import subprocess
 from pathlib import Path
 
+# get the full paths 
 FOLDER = Path(__file__).parent
 
 def main():

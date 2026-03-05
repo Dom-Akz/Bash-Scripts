@@ -1,6 +1,6 @@
 #!/bin/env bash
 
-# use the /sys fodler
+# use the /sys
 disable-usb() {
 	for usb in $(find /sys/bus/usb/devices/ -name "*usb*"); do
 		local location="$usb/authorized"
@@ -24,7 +24,11 @@ disable-hdmi() {
 
 main() {
 
-	#com=$(lspci | grep -E "USB|Audio|VGA|HDMI|Display|Ethernet|Network|Thunderbolt|FireWire|IEEE 1394|Serial Port|Parallel Port|eSATA|Card Reader|Modem|Bluetooth|WiFi|WLAN|Graphics|3D|Video")
+	#initilaize the pci bus :
+	#echo '1' | sudo tee /sys/bus/pci/resan
+
+	#com=$(lspci | grep -E "USB|Audio|VGA|HDMI|Display|Ethernet|Network|Thunderbolt|FireWire|IEEE 1394
+	#|Serial Port|Parallel Port|eSATA|Card Reader|Modem|Bluetooth|WiFi|WLAN|Graphics|3D|Video")
 	disable-usb
 
 	disable-hdmi

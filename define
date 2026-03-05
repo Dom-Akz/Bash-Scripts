@@ -20,11 +20,11 @@ def=$(echo "$query" | jq -r '[.[].meanings[] | {pos: .partOfSpeech, def: .defini
 
 # Requires a notification daemon to be installed
 # notify-send -t 60000 "$word -" "$def"
-#echo "$word" " definition: " "$def"
+# echo "$word" " definition: " "$def"
 
 ### MORE OPTIONS :)
 
-# Show first definition for each part of speech (thanks @morgengabe1 on youtube)
+# Show first definition for each part of speech
 # def=$(echo "$query" | jq -r '.[0].meanings[] | "\(.partOfSpeech): \(.definitions[0].definition)\n"')
 
 # Show all definitions

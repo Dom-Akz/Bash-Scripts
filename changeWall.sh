@@ -69,8 +69,7 @@ log-to-file() {
 			msg=$(printf "%s\n" "${arr[@]}") # joined the array into a string
 		fi
 
-		echo -e "[$(date)]\nWallpapers Directory:"$dir"\nCurrent Wallpaper:"$curr_wall"\n$msg
-			" >>"$LOG_"
+		echo -e "[$(date)]\nWallpapers Directory:"$dir"\nCurrent Wallpaper:"$curr_wall"\n$msg" >>"$LOG_"
 	fi
 }
 
@@ -108,7 +107,11 @@ while true; do
 			WALL_DIR="$MR_WALL"
 			init_wallpaper_list "$WALL_DIR"
 		fi
-		[[ "$tmp_walldir" != "$WALL_DIR" ]] && info+=("New wallpaper directory: "$(date +%H:%M)"")
+		# check if the wallpaper directory change:
+		if [ "$tmp_walldir" != "$WALL_DIR" ]; then
+			info+=("New wallpaper directory: "$(date +%H:%M)"")
+			info+=("Wallpapers list : /tmp/wallpaper_list.txt")
+		fi
 	fi
 
 	current_index=$(cat "$STATE_FILE")
@@ -129,8 +132,8 @@ while true; do
 		run_time=""
 	fi
 
-	log-to-file "$WALL_DIR" "$IMG" info # this call dose not create a copy so the function use the original array
 	bash $SWITCH_SCRIPT --image "$IMG" --mode dark --type auto >/dev/null 2>&1
+	log-to-file "$WALL_DIR" "$IMG" info # this call dose not create a copy so the function use the original array
 	sleep 350
 
 done
