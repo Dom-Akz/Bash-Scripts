@@ -2,16 +2,22 @@
 
 # create a executable bash script
 # with option -n : open script in vim (use the same session)
+DEF_DIR="/$HOME/.local/bin/"
 
 can_open=false
-
-while getopts "nh" opt; do
+location="$DEF_DIR"
+while getopts "nhl:" opt; do
 	case "$opt" in
 	n)
 		can_open=true
 		;;
+	l)
+		location="$OPTARG""/"
+		;;
 	h)
-		echo -e "Usage nsh filename [options]\n	-n : open file with vim"
+		echo -e "Default directory is: /home/$(whoami)/.local/bin/
+			\nUsage nsh filename [options]
+			\n-n :open file with neovim\n-l :file location"
 		exit 0
 		;;
 	\*)
@@ -25,23 +31,25 @@ done
 shift $((OPTIND - 1))
 
 if [ -z "$1" ]; then
-	echo "no name was provide"
+	echo "no filename given"
 	exit 1
 fi
 
-if [ -f "$HOME/.local/bin/$1" ]; then
+ff="$location""$1"
+
+if [ -f "$ff" ]; then
 	echo 'script name exists'
 	exit 1
 fi
 
-touch $HOME/.local/bin/"$1"
-
-echo -e "#!/bin/bash" "\n echo 'script $1 created' " >>$HOME/.local/bin/"$1"
-
-chmod +x $HOME/.local/bin/"$1"
+touch $ff
+echo -e "#!/bin/bash" "\n echo 'script $1 created' " >>"$ff"
+chmod +x "$ff"
 
 if $can_open; then
-	nvim /$HOME/.local/bin/"$1"
-else
-	"$1"
+	if type -P nvim >/dev/null 2>&1; then
+		nvim "$ff"
+	else
+		vim "$ff"
+	fi
 fi
