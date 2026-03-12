@@ -105,6 +105,7 @@ main() {
 
 	if [ -z "$com" ]; then
 		echo "no command provide"
+		usage
 		exit 2
 	fi
 
