@@ -4,6 +4,13 @@
 # with option -n : open script in vim (use the same session)
 DEF_DIR="/$HOME/.local/bin/"
 
+usage() {
+	echo -e "Default directory is: /home/$(whoami)/.local/bin/
+			\nUsage nsh filename [options]
+			\n-h:display this help
+			\n-n :open file with neovim\n-l :file location"
+}
+
 can_open=false
 location="$DEF_DIR"
 while getopts "nhl:" opt; do
@@ -15,9 +22,7 @@ while getopts "nhl:" opt; do
 		location="$OPTARG""/"
 		;;
 	h)
-		echo -e "Default directory is: /home/$(whoami)/.local/bin/
-			\nUsage nsh filename [options]
-			\n-n :open file with neovim\n-l :file location"
+		usgae
 		exit 0
 		;;
 	\*)
@@ -32,6 +37,7 @@ shift $((OPTIND - 1))
 
 if [ -z "$1" ]; then
 	echo "no filename given"
+	usage
 	exit 1
 fi
 
