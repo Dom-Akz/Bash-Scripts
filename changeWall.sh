@@ -74,7 +74,7 @@ log-to-file() {
 }
 
 init_wallpaper_list() {
-	find "$1" -type f \( -iname "*.png" -o -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.webp" -o -iname "*.mp4" \) | shuf >"$LIST_FILE"
+	find "$1" -type f \( -iname "*.png" -o -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.webp" -o -iname "*.webm" -o -iname "*.mp4" \) | shuf >"$LIST_FILE"
 	echo "0" >"$STATE_FILE"
 }
 
