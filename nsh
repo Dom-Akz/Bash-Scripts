@@ -1,49 +1,71 @@
 #!/bin/bash
 
-# create a executable bash script
-# with option -n : open script in nvim/vim
-DIR="$HOME/.local/bin/"
+# create a executable script (default bash)
 
-user=$(whoami)
+declare -r user=$(whoami)
+declare -r sname='nsh'
+
+declare LOCATION="$HOME"/.local/bin
+
+declare -i OPEN=0
 
 usage() {
-	echo -e "Usage nsh [options] filename
-			\n-h:display this help\n-n: open file with neovim\n-l: file location"
-	echo -e "Default Value:
-			\ndefault directory is: /home/"$user"/.local/bin/
-			\ndefault extenstion: .sh (bash)"
+	cat <<EOF
+Usage ${sname} [options] filename
+
+Options:
+  -h, --help	displaydisplay this help
+  -o, --open	open file in vim or neovim
+  -l, --location	file location
+
+Default Value:
+  default directory is: /home/${user}/.local/bin/
+  default file: bash
+EOF
 }
 
 handle_ext() {
 	local ext=$1
-	local fn=$2
-	local path=$3
+	local path=$2
 	case "$ext" in
-	".py")
-		echo "print("$fn created")" >$path
+	'py')
+		printf "print('script created')" >"$path"
 		;;
-	".c")
-		echo -e "include<stdio.h>\nprintf("$fn created")" >$path
+	'c')
+		echo -e '#include<stdio.h>\nint main(){\nprintf("script created");\nreturn 0;\n}' >"$path"
 		;;
-	"*")
-		echo "[ExtentionError]: Unsupported extenstion"
+	'*')
+		echo "[ExtentionError]: Unsupported extensions"
 		exit 1
 		;;
 	esac
 }
 
-can_open=false
-location="$DIR"
-while getopts "nhl:" opt; do
+handle_file() {
+	if [ -f "$1" ]; then
+		echo "file exist! (try different name)"
+		exit 1
+	fi
+	touch "$1"
+	if [ $(ls -ld "$1" | awk '{print $3}') != "root" ]; then
+		chmod +x "$1"
+		bash "$1"
+	else
+		sudo chmod +x "$1"
+		sudo bash "$1"
+	fi
+}
+
+while getopts "ohl:" opt; do
 	case "$opt" in
-	n)
-		can_open=true
+	o)
+		OPEN=1
 		;;
 	l)
-		location="$OPTARG""/"
+		LOCATION="$OPTARG""/"
 		;;
 	h)
-		usgae
+		usage
 		exit 0
 		;;
 	\*)
@@ -56,37 +78,33 @@ done
 
 shift $((OPTIND - 1))
 
-if [ -z "$1" ]; then
+filename="$1"
+
+if [ -z "$filename" ]; then
 	echo "no filename given"
 	usage
 	exit 1
 fi
 
-if [ -f "$ff" ]; then
-	echo 'script name exists'
+if [ ! -d $LOCATION ]; then
+	echo "$LOCATION No such file or directory"
 	exit 1
 fi
 
-ff="$location""$1" # this is the path/file
-if [ $(ls -ld "$location" | awk '{print $3}') != "root" ]; then
-	touch "$ff"
-	chmod +x "$ff"
-else
-	sudo touch "$ff"
-	sudo chmod +x "$ff"
-fi
+ff="$LOCATION""$filename"
+handle_file $ff
 
-# check if the filename containe a extention
-echo "$1" | grep "\.[a-zA-Z0-9]\+$" 2>/dev/null
+# check if the filename containe a extensions
+printf "$filename" | grep "\.[a-zA-Z0-9]\+$" >/dev/null
 if [ $? -eq 0 ]; then
-	ext=$(echo "$1" | cut -d'.' -f2) # extract the file extenstion
-	handle_ext $ext $1 $ff
+	ext=$(printf "$filename" | cut -d'.' -f2) # extract the extensions
+	handle_ext $ext $ff
 else
-	echo -e "#!/bin/bash" "\necho 'script $1 created'" >"$ff"
+	echo -e "#!/bin/bash" "\necho 'script created'" >"$ff"
 fi
 
 # check if neovim exist
-if $can_open; then
+if [ $OPEN -eq 1 ]; then
 	if type -P nvim >/dev/null 2>&1; then
 		nvim "$ff"
 	else
