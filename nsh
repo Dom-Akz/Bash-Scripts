@@ -49,10 +49,10 @@ handle_file() {
 	touch "$1"
 	if [ $(ls -ld "$1" | awk '{print $3}') != "root" ]; then
 		chmod +x "$1"
-		bash "$1"
+		[[ $OPEN == 0 ]] && bash "$1"
 	else
 		sudo chmod +x "$1"
-		sudo bash "$1"
+		[[ $OPEN == 0 ]] && sudo bash "$1"
 	fi
 }
 
