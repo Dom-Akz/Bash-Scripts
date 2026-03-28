@@ -8,14 +8,14 @@ DIR=("$HOME/.config/"
 	"/usr/share/"
 )
 
-LIST_CONF=""
+declare LIST_CONF="/tmp/cmd_name:"
 
 # check if command line is valid (exists) or not
 check-cm() {
 	if type -P "$1" >/dev/null 2>&1; then
 		return
 	else
-		echo ""$1" not found"
+		echo "$1 not found! (try running with -c)"
 		exit 1
 	fi
 }
@@ -24,8 +24,8 @@ print() {
 	local nb=$(cat "$LIST_CONF" | wc -l)
 	local msg=$1
 
-	echo -e "$1"
-	if [ "$nb" -lt 21 ]; then
+	echo -e $msg # -e, msg have \n
+	if [ "$nb" -lt 11 ]; then
 		cat "$LIST_CONF" 2>/dev/null | bat -l txt --file-name "$LIST_CONF"
 	else
 		head -n 20 "$LIST_CONF" 2>/dev/null | bat -l txt --file-name "$LIST_CONF"
@@ -59,10 +59,12 @@ get-files() {
 }
 
 usage() {
-	echo "Usage : fnc [options] command"
-	echo "-h : disply help"
-	echo "-r : restore the configuration files to a file"
-	echo "-c : deep search for configurations files"
+	cat <<EOF
+Usage : fnc [options] command
+-h : display help
+-r : restore the configuration files to a file
+-c : deep search for configuration files
+EOF
 }
 
 restore() {
@@ -76,16 +78,16 @@ restore() {
 
 main() {
 	# init :
-	can_restore=false
-	search_command=false
+	declare -i can_restore=0
+	declare -i search_command=0
 
 	while getopts "rch" opt; do
 		case "$opt" in
 		r)
-			can_restore=true
+			can_restore=1
 			;;
 		c)
-			search_command=true
+			search_command=1
 			;;
 		h)
 			usage
@@ -102,6 +104,8 @@ main() {
 	shift $((OPTIND - 1))
 	local com="$1"
 	local msg="Possible locations are:"
+	# set file name :
+	LIST_CONF="$LIST_CONF$com.fnc"
 
 	if [ -z "$com" ]; then
 		echo "no command provide"
@@ -109,14 +113,7 @@ main() {
 		exit 2
 	fi
 
-	if ! $search_command; then
-		check-cm "$com"
-	fi
-
-	# set file name :
-	LIST_CONF="/tmp/cm_name:$com.fnc"
-
-	if $can_restore; then
+	if [ $can_restore -eq 1 ]; then
 		msg=$(restore)
 	else
 		if [ -f "$LIST_CONF" ]; then
@@ -125,10 +122,12 @@ main() {
 		fi
 	fi
 
+	if [ $search_command -eq 0 ] && [ $can_restore -eq 0 ]; then
+		check-cm "$com"
+	fi
+
 	get-files "$com"
 	print "$msg"
-
-	exit 0
 }
 
 main "$@"
