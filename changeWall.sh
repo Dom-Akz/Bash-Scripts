@@ -1,26 +1,29 @@
 #!/bin/bash
 
 # get date once
-date_=$(date +%d-%m-%y)
+declare date_=$(date +%d-%m-%y)
 
 SWITCH_SCRIPT="$HOME/.config/quickshell/ii/scripts/colors/switchwall.sh"
+
+# wallpapers
 MR_WALL="$HOME/Pictures/Wallpapers/MR_WALL"
 NG_WALL="$HOME/Pictures/Wallpapers/NG_WALL"
-LIST_FILE="/tmp/wallpaper_list.txt"
-STATE_FILE="/tmp/wallpaper_state.txt"
-DEFAULT_IMG="$HOME/Pictures/WALL/anime_skull.png" # add check if the img exist or not
 SM_WALL="$HOME/Pictures/Wallpapers/SM"
 RAIN_WALL="$HOME/Pictures/Wallpapers/RAIN"
 VID_WALL="$HOME/Pictures/Wallpapers/VID_WALL/"
+
+LIST_FILE="/tmp/wallpaper_list.txt"
+STATE_FILE="/tmp/wallpaper_state.txt"
+
+DEFAULT_IMG="$HOME/Pictures/WALL/anime_skull.png"      # add check if the img exist or not
 LOG_="$HOME/.local/share/chwall/Wallpapers-$date_.log" # path to log file. every day it create new one.
 
-# only run one time
-LAT=$(curl -s https://ipinfo.io/loc | cut -d, -f1)
-LONG=$(curl -s https://ipinfo.io/loc | cut -d, -f2)
+declare -r LAT=$(curl -s https://ipinfo.io/loc | cut -d, -f1)
+declare -r LONG=$(curl -s https://ipinfo.io/loc | cut -d, -f2)
 
 timeofday() {
 	local h=$(date +%H)
-	if [ "$h" -gt 8 ] && [ "$h" -lt 19 ]; then
+	if [ "$h" -gt 7 ] && [ "$h" -lt 19 ]; then
 		echo "morning"
 	else
 		echo "night"
