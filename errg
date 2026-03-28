@@ -1,12 +1,14 @@
 #!/bin/bash
 
-SWITCH_SCRIPT="$HOME/.config/quickshell/ii/scripts/colors/switchwall.sh"
-IMG_PATH="/$HOME/Pictures/WALL/anime_skull.png"
+declare -r SWITCH_SCRIPT="$HOME/.config/quickshell/ii/scripts/colors/switchwall.sh"
+declare -r IMG_PATH="/$HOME/Pictures/WALL/anime_skull.png"
+declare -r PNAME="$HOME/.local/bin/changeWall.sh"
 
-pkill -9 changeWall.sh 2>/dev/null
-# check if the script was not runing
-if [ $? -eq 1 ]; then
-	exit 0
+declare -i PID=$(pgrep -f "$PNAME")
+
+# check if the script is runing
+if [ $? -eq 0 ]; then
+	kill $PID
 fi
 
 bash "$SWITCH_SCRIPT" --image "$IMG_PATH" --mode dark --type auto >/dev/null 2>&1
