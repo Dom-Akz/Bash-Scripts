@@ -13,13 +13,13 @@ end
 
 # show the password of the current network connection
 # -s : show the secret password (hiiddne)
-function showpsk
+function psk
    nmcli conn show $argv[1] -s | grep -m 1 "802-11-wireless-security.psk" | awk '{print $NF}' 
 end
 
-# quick du 
+# long du 
 # go the directory and get all disque usage of all the files or sub-dirctorys
-function qdu --description "print disque usage of all files and sub-dirctorys" 
+function ldu --description "print disque usage of all files and sub-dirctorys" 
     du -cha $argv[1]/* | sort -h
 end
 
@@ -28,10 +28,20 @@ function rmp
     set PATH (string match -v $argv[1] $PATH)
 end
 
+# add path to $PATH
 function adp
    set -U fish_user_paths $argv[1]
 end
 
+# search process
+function p 
+    ps aux | grep $argv[1]
+end
+
+# dir owner
+function own
+    ls -ld $argv[1] | awk '{print $3}'
+end
 
 if status is-interactive
 
@@ -44,6 +54,7 @@ if status is-interactive
     end
     
     hyfetch
+
     # Aliases
     alias pamcan pacman
     alias ls 'eza --icons'
@@ -52,10 +63,19 @@ if status is-interactive
     alias c 'clear;hyfetch'
     alias C 'clear;hyfetch'
     alias nv 'nvim'
-    alias l 'ls'
+    alias l 'ls --color=auto'
+    alias h 'cd ~'
+    alias mv 'mv -i' # confirmation
+    alias k 'killall -i'
+    alias mem 'free -h | bat -l cpuinfo -p'
+    alias i 'curl ipinfo.io/ip'
+    alias lo 'curl ipinfo.io/region'
+    alias llo 'curl ipinfo.io/'
+    alias zn 'zen-browser' 
     #alias clean 'find ~/.local/share/chwall// -type f ! -name "Wallpapers-$(date +%d-%m-%y).log" -delete'
-   
-
+    alias dconn 'sudo systemctl stop iwd && sudo systemctl stop NetworkManager'
+    alias uconn 'sudo systemctl start iwd && sudo systemctl start NetworkManager'
+    
     # pacman and yay : 
     alias update 'sudo pacman -Syu'
     alias ycl 'yay -Syu'
@@ -69,8 +89,7 @@ if status is-interactive
     alias dely 'yay -R'
     alias ddely 'yay -Rns'
 
-    # weahter alias :
-    
+    # weahter alias :  
     alias met 'curl https://wttr.in?format=3'
     alias meta 'curl https://wttr.in/'
     alias suns 'curl wttr.in\?format="%s"' # sunset

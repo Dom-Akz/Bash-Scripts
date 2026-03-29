@@ -1,8 +1,8 @@
 #!/bin/bash
 
 declare -r SWITCH_SCRIPT="$HOME/.config/quickshell/ii/scripts/colors/switchwall.sh"
-declare -r IMG_PATH="/$HOME/Pictures/WALL/anime_skull.png"
-declare -r PNAME="$HOME/.local/bin/changeWall.sh"
+declare -r IMG_PATH="/$HOME/Pictures/Wallpapers/Wall/fb.png"
+declare -r PNAME="$HOME/.local/bin/Wallpapers.sh"
 
 declare -i PID=$(pgrep -f "$PNAME")
 

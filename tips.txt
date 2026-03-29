@@ -1,0 +1,1 @@
+$! get pid of ps that u just run it
