@@ -72,7 +72,7 @@ log-to-file() {
 			msg=$(printf "%s\n" "${arr[@]}") # joined the array into a string
 		fi
 
-		echo -e "[$(date)]\nWallpapers Directory:"$dir"\nCurrent Wallpaper:"$curr_wall"\n$msg" >>"$LOG_"
+		echo -e "[$(date)]\nWallpapers Directory: "$dir"\nCurrent Wallpaper: "$curr_wall"\n$msg" >>"$LOG_"
 	fi
 }
 
@@ -83,13 +83,21 @@ init_wallpaper_list() {
 
 [ ! -f "$LIST_FILE" ] || [ ! -s "$LIST_FILE" ] && init_wallpaper_list "$MR_WALL"
 
+# check if the script is running and get the start run time
 run_time=$(ps aux | grep .local/bin/changeWall.sh | awk 'NR==1 {print $9}')
+
 last_run=0
 WALL_DIR="$MR_WALL"
 while true; do
 
 	current_time=$(date +%s)
 	info=()
+
+	# check if run_time is set
+	if [[ -n $run_time ]]; then
+		info+=("Start runnig at: $run_time")
+		run_time=""
+	fi
 
 	if [ $((current_time - last_run)) -ge 3600 ]; then
 
@@ -124,19 +132,15 @@ while true; do
 	IMG=$(sed -n "${next_line}p" "$LIST_FILE")
 	echo "$((current_index + 1))" >"$STATE_FILE"
 	wall_exists=$(find "$WALL_DIR" -wholename "$IMG" | wc -l)
-	if [ "$wall_exists" -eq 0 ]; then
+	if [[ $wall_exists -eq 0 ]]; then
 		IMG="$DEFAULT_IMG"
 		info+=("Using default image: $DEFAULT_IMG")
 	fi
 
 	info+=("Total wallpapers: $total_files")
-	if [ -n "$run_time" ]; then
-		info+=("Start runnig at: $run_time")
-		run_time=""
-	fi
-
+	current_image=$(basename $IMG)
 	bash $SWITCH_SCRIPT --image "$IMG" --mode dark --type auto >/dev/null 2>&1
-	log-to-file "$WALL_DIR" "$IMG" info # this call dose not create a copy so the function use the original array
+	log-to-file $WALL_DIR $current_image info # this call dose not create a copy so the function use the original array
 	sleep 350
 
 done
