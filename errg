@@ -2,13 +2,7 @@
 
 declare -r SWITCH_SCRIPT="$HOME/.config/quickshell/ii/scripts/colors/switchwall.sh"
 declare -r IMG_PATH="/$HOME/Pictures/Wallpapers/Wall/fb.png"
-declare -r PNAME="$HOME/.local/bin/Wallpapers.sh"
 
-declare -i PID=$(pgrep -f "$PNAME")
-
-# check if the script is runing
-if [ $? -eq 0 ]; then
-	kill $PID
-fi
+pgrep -x "Wallpapers.sh" && pkill -USR2 "Wallpapers.sh"
 
 bash "$SWITCH_SCRIPT" --image "$IMG_PATH" --mode dark --type auto >/dev/null 2>&1
