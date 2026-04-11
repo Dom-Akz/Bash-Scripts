@@ -139,7 +139,7 @@ while true; do
 
 	info+=("Total wallpapers: $total_files")
 	current_image=$(basename $IMG)
-	bash $SWITCH_SCRIPT --image "$IMG" --mode dark --type auto >/dev/null 2>&1
+	caelestia wallpaper -f "$IMG" >/dev/null 2>&1
 	log-to-file $WALL_DIR $current_image info # this call dose not create a copy so the function use the original array
 	sleep 350
 

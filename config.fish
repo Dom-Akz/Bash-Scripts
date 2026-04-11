@@ -43,6 +43,10 @@ function own
     ls -ld $argv[1] | awk '{print $3}'
 end
 
+function rkill
+    pgrep -x $argv[1] && pkill -USR2 $argv[1]
+end
+
 if status is-interactive
 
     set fish_greeting
@@ -75,7 +79,8 @@ if status is-interactive
     #alias clean 'find ~/.local/share/chwall// -type f ! -name "Wallpapers-$(date +%d-%m-%y).log" -delete'
     alias dconn 'sudo systemctl stop iwd && sudo systemctl stop NetworkManager'
     alias uconn 'sudo systemctl start iwd && sudo systemctl start NetworkManager'
-    
+
+
     # pacman and yay : 
     alias update 'sudo pacman -Syu'
     alias ycl 'yay -Syu'
