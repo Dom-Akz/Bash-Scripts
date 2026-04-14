@@ -1,19 +1,8 @@
 #!/bin/bash
-LAT=$(curl -s https://ipinfo.io/loc | cut -d, -f1)
-LONG=$(curl -s https://ipinfo.io/loc | cut -d, -f2)
+declare -r LAT=$(curl -s https://ipinfo.io/loc | cut -d, -f1)
+declare -r LONG=$(curl -s https://ipinfo.io/loc | cut -d, -f2)
 
-isRain() {
-	local rain=$(curl -s "https://api.open-meteo.com/v1/forecast?latitude=$LAT&longitude=$LONG&current=precipitation" |
-		grep -o '"precipitation":[0-9.]*' | cut -d: -f2)
+rain=$(curl -s "https://api.open-meteo.com/v1/forecast?latitude=$LAT&longitude=$LONG&current=precipitation" |
+	grep -o '"precipitation":[0-9.]*' | cut -d : -f2)
 
-	if [[ -z "$rain" ]] || [[ "$rain" == "null" ]]; then
-		echo "null"
-	elif (($(echo "$rain > 0" | bc -l 2>/dev/null))); then
-		echo "rain"
-	else
-		echo "no rain"
-	fi
-	echo "$rain"
-}
-
-echo $(isRain)
+echo "$rain"" mm"
