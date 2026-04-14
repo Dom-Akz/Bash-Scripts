@@ -42,12 +42,6 @@ get-files() {
 		if [ "$?" -eq 1 ]; then
 			continue
 		else
-			if [[ $can_create_file -eq 1 ]]; then
-				can_create_file=0 # one time
-				lc=$(touch $LIST_CONF /dev/null 2>&1)
-				[ $? -ne 0 ] && echo "$lc" && exit 2 # in case any error
-			fi
-
 			echo "$res" >>$LIST_CONF
 		fi
 	done
