@@ -23,7 +23,7 @@ declare -r LONG=$(curl -s https://ipinfo.io/loc | cut -d, -f2)
 
 timeofday() {
 	local h=$(date +%H)
-	if [ "$h" -gt 7 ] && [ "$h" -lt 19 ]; then
+	if [ "$h" -gt 7 ] && [ "$h" -lt 20 ]; then
 		echo "morning"
 	else
 		echo "night"
