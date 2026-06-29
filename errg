@@ -1,6 +1,6 @@
 #!/bin/bash
 
-declare -r IMG_PATH="/$HOME/Pictures/Wallpapers/Wall/fb.png"
+declare -r IMG_PATH="/$HOME/Pictures/Wallpapers/Wall/Hyprland.png"
 
 pgrep -x "Wallpapers.sh" && pkill -USR2 "Wallpapers.sh"
 

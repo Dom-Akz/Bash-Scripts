@@ -5,7 +5,7 @@
 declare -r user=$(whoami)
 declare -r sname='nsh'
 
-declare LOCATION="$HOME"/.local/bin
+declare LOCATION="$HOME"/.local/bin/
 
 declare -i OPEN=0
 

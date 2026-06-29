@@ -1,11 +1,21 @@
 #!/bin/bash
 
 # list of paths to search for conf files
-DIR=("$HOME/.config/"
+declare -r DIR=("$HOME/.config/"
 	"$HOME/"
 	"$HOME/.local/share/"
 	"/etc/"
 	"/usr/share/"
+)
+
+# most common conf files extsions
+declare -r EXT=(
+	"conf"
+	"config"
+	"json"
+	"jsonc"
+	"yaml"
+	"toml"
 )
 
 declare LIST_CONF="/tmp/cmd_name:"
@@ -24,7 +34,7 @@ print() {
 	local nb=$(cat "$LIST_CONF" | wc -l)
 	local msg=$1
 
-	echo -e $msg # -e, msg have \n
+	echo -e $msg
 	if [ "$nb" -lt 11 ]; then
 		cat "$LIST_CONF" 2>/dev/null | bat -l txt --file-name "$LIST_CONF"
 	else
@@ -35,10 +45,15 @@ print() {
 
 # get the config files and store them in a file (!this function can stop the script):
 get-files() {
-	local can_create_file=0
 	local com="$1"
+	local file_ext="$2"
+	local cm=""
+	# set the commande
+	#if $file_ext; then
+	#TODO: set the condition for find using the EXT
+	#fi
 	for dir in "${DIR[@]}"; do
-		res=$(find "$dir""$com" -type f -printf 'file:///%p\n' 2>/dev/null)
+		res=$(find "$dir""$com" -name ".*" -prune -o -type f -printf 'file:///%p\n' 2>/dev/null)
 		if [ "$?" -eq 1 ]; then
 			continue
 		else
@@ -58,6 +73,7 @@ Usage : fnc [options] command
 -h : display help
 -r : restore the configuration files to a file
 -c : deep search for configuration files
+-m : only search for configuration files with most common extensions (does not support application-specific extensions)
 EOF
 }
 
@@ -72,16 +88,20 @@ restore() {
 
 main() {
 	# init :
-	declare -i can_restore=0
-	declare -i search_command=0
+	local can_restore=false
+	local search_command=false
+	local use_cm_ext=false
 
-	while getopts "rch" opt; do
+	while getopts "rcmh" opt; do
 		case "$opt" in
 		r)
-			can_restore=1
+			can_restore=true
 			;;
 		c)
-			search_command=1
+			search_command=true
+			;;
+		m)
+			use_cm_ext=true
 			;;
 		h)
 			usage
@@ -107,7 +127,7 @@ main() {
 		exit 2
 	fi
 
-	if [ $can_restore -eq 1 ]; then
+	if $can_restore; then
 		msg=$(restore)
 	else
 		if [ -f "$LIST_CONF" ]; then
@@ -116,12 +136,12 @@ main() {
 		fi
 	fi
 
-	if [ $search_command -eq 0 ] && [ $can_restore -eq 0 ]; then
+	if ! $search_command && ! $can_restore; then
 		check-cm "$com"
 	fi
 
-	get-files "$com"
-	print "$msg"
+	get-files $com $use_cm_ext
+	print $msg
 }
 
 main "$@"
