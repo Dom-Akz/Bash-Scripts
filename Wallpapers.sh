@@ -11,6 +11,7 @@ NG_WALL="$HOME/Pictures/Wallpapers/NG_WALL"
 SM_WALL="$HOME/Pictures/Wallpapers/SM"
 RAIN_WALL="$HOME/Pictures/Wallpapers/RAIN"
 VID_WALL="$HOME/Pictures/Wallpapers/VID_WALL/"
+FEM_WALL="$HOME/Pictures/Wallpapers/FEM-WALL/"
 
 LIST_FILE="/tmp/wallpaper_list.txt"
 STATE_FILE="/tmp/wallpaper_state.txt"
@@ -55,6 +56,17 @@ isRain() {
 		return 0 # rain
 	else
 		return 1 # no rain
+	fi
+}
+
+fem-time() {
+	# all the time btw :)
+	# so let's say at nigth (from 1:00 AM) in the weekend
+	day=$(date | awk '{printf $1}')
+	if [[ "$day" == "Sat" ]] || [[ "$day" == "Sun" ]] && [[ $(date +%H) -gt 1 ]] && [[ $(date +%H) -lt 5 ]]; then
+		return 0
+	else
+		return 1
 	fi
 }
 

@@ -8,16 +8,6 @@ declare -r DIR=("$HOME/.config/"
 	"/usr/share/"
 )
 
-# most common conf files extsions
-declare -r EXT=(
-	"conf"
-	"config"
-	"json"
-	"jsonc"
-	"yaml"
-	"toml"
-)
-
 declare LIST_CONF="/tmp/cmd_name:"
 
 # check if command line is valid (exists) or not
@@ -36,9 +26,9 @@ print() {
 
 	echo -e $msg
 	if [ "$nb" -lt 11 ]; then
-		cat "$LIST_CONF" 2>/dev/null | bat -l txt --file-name "$LIST_CONF"
+		cat "$LIST_CONF" 2>/dev/null
 	else
-		head -n 20 "$LIST_CONF" 2>/dev/null | bat -l txt --file-name "$LIST_CONF"
+		head -n 20 "$LIST_CONF" 2>/dev/null
 		echo -e "\nsee more: $LIST_CONF"
 	fi
 }
@@ -47,11 +37,7 @@ print() {
 get-files() {
 	local com="$1"
 	local file_ext="$2"
-	local cm=""
 	# set the commande
-	#if $file_ext; then
-	#TODO: set the condition for find using the EXT
-	#fi
 	for dir in "${DIR[@]}"; do
 		res=$(find "$dir""$com" -name ".*" -prune -o -type f -printf 'file:///%p\n' 2>/dev/null)
 		if [ "$?" -eq 1 ]; then
@@ -64,6 +50,11 @@ get-files() {
 	if [[ ! -s "$LIST_CONF" ]]; then
 		echo "$com : No configurations files found"
 		exit 0
+	fi
+	# if flag m is set
+	if $file_ext; then
+		cp $LIST_CONF "/tmp/tmp-$com" # find better way
+		cat "/tmp/tmp-$com" | grep -E ".conf|.config|.toml|.json|.sjson" >"$LIST_CONF"
 	fi
 }
 
