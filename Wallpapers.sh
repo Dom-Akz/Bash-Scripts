@@ -12,6 +12,7 @@ SM_WALL="$HOME/Pictures/Wallpapers/SM"
 RAIN_WALL="$HOME/Pictures/Wallpapers/RAIN"
 VID_WALL="$HOME/Pictures/Wallpapers/VID_WALL/"
 FEM_WALL="$HOME/Pictures/Wallpapers/FEM-WALL/"
+AVG_WALL="$HOME/Pictures/Wallpapers/AVG_WALL/"
 
 LIST_FILE="/tmp/wallpaper_list.txt"
 STATE_FILE="/tmp/wallpaper_state.txt"
@@ -61,9 +62,9 @@ isRain() {
 
 fem-time() {
 	# all the time btw :)
-	# so let's say at nigth (from 1:00 AM) in the weekend
+	# so let's say at nigth (from 1:00 AM) ALL DAYYEES
 	day=$(date | awk '{printf $1}')
-	if [[ "$day" == "Sat" ]] || [[ "$day" == "Sun" ]] && [[ $(date +%H) -gt 1 ]] && [[ $(date +%H) -lt 5 ]]; then
+	if [[ $(date +%H) -gt 1 ]] && [[ $(date +%H) -lt 5 ]]; then
 		return 0
 	else
 		return 1
@@ -75,6 +76,7 @@ log-to-file() {
 		echo -e "\n[$(date)]\n WARNING: no information was given" >>$LOG_
 	else
 		local dir="$1"
+		local header=""
 
 		local curr_wall="$2" # if the default wall
 		local -n arr=$3      # using the original array
@@ -83,8 +85,8 @@ log-to-file() {
 		if [ "${#arr[@]}" -gt 0 ]; then   # check if the array is not empty
 			msg=$(printf "%s\n" "${arr[@]}") # joined the array into a string
 		fi
-
-		echo -e "[$(date)]\nWallpapers Directory: "$dir"\nCurrent Wallpaper: "$curr_wall"\n$msg" >>"$LOG_"
+		[[ $4 == 1 ]] && header="-- The wallpaper is set to avg_wall to change it you need to terminate this instance and run anther one without the -v option --"
+		echo -e "\n$header\n[$(date)]\nWallpapers Directory: "$dir"\nCurrent Wallpaper: "$curr_wall"\n$msg" >>"$LOG_"
 	fi
 }
 
@@ -93,47 +95,69 @@ init_wallpaper_list() {
 	echo "0" >"$STATE_FILE"
 }
 
-[ ! -f "$LIST_FILE" ] || [ ! -s "$LIST_FILE" ] && init_wallpaper_list "$MR_WALL"
+# init:
+avg=0
+last_run=0
+WALL_DIR="$MR_WALL"
+info=()
 
 # check if the script is running and get the start run time
 run_time=$(ps aux | grep .local/bin/changeWall.sh | awk 'NR==1 {print $9}')
 
-last_run=0
-WALL_DIR="$MR_WALL"
+while getopts "v" opt; do
+	case "$opt" in
+	v)
+		avg=1
+		;;
+	*)
+		echo "use -v to set it to the avg wallpaper"
+		;;
+	esac
+done
+
+if [ $avg == 1 ]; then
+	WALL_DIR="$AVG_WALL"
+	init_wallpaper_list "$AVG_WALL"
+fi
+
+[ ! -f "$LIST_FILE" ] || [ ! -s "$LIST_FILE" ] && init_wallpaper_list "$MR_WALL"
+
 while true; do
 
 	current_time=$(date +%s)
-	info=()
 
 	# check if run_time is set
 	if [[ -n $run_time ]]; then
 		info+=("Start runnig at: $run_time")
 		run_time=""
 	fi
+	# skip if the script execute with -v option and stick with the avg_wall only
+	if [ $avg == 0 ]; then
+		# every hour
+		if [ $((current_time - last_run)) -ge 3600 ]; then
 
-	if [ $((current_time - last_run)) -ge 3600 ]; then
-
-		tm_day=$(timeofday)
-		last_run=$current_time
-		tmp_walldir="$WALL_DIR"
-		info+=("Api call now next call in: $(date -d '+1 hour' +'%H:%M')")
-		if isHot; then
-			WALL_DIR="$SM_WALL"
-			init_wallpaper_list "$WALL_DIR"
-		elif isRain; then
-			WALL_DIR="$RAIN_WALL"
-			init_wallpaper_list "$WALL_DIR"
-		elif [ "$tm_day" = "night" ] && [ "$WALL_DIR" != "$NG_WALL" ]; then
-			WALL_DIR="$NG_WALL"
-			init_wallpaper_list "$WALL_DIR"
-		elif [ "$tm_day" = "morning" ] && [ "$WALL_DIR" != "$MR_WALL" ]; then
-			WALL_DIR="$MR_WALL"
-			init_wallpaper_list "$WALL_DIR"
-		fi
-		# check if the wallpaper directory change:
-		if [ "$tmp_walldir" != "$WALL_DIR" ]; then
-			info+=("New wallpaper directory: "$(date +%H:%M)"")
-			info+=("Wallpapers list : /tmp/wallpaper_list.txt")
+			tm_day=$(timeofday)
+			last_run=$current_time
+			tmp_walldir="$WALL_DIR"
+			info+=("Api call now next call in: $(date -d '+1 hour' +'%H:%M')")
+			if isHot; then
+				WALL_DIR="$SM_WALL"
+				init_wallpaper_list "$WALL_DIR"
+			elif isRain; then
+				WALL_DIR="$RAIN_WALL"
+				init_wallpaper_list "$WALL_DIR"
+			elif [ "$tm_day" = "night" ] && [ "$WALL_DIR" != "$NG_WALL" ]; then
+				WALL_DIR="$NG_WALL"
+				init_wallpaper_list "$WALL_DIR"
+			elif [ "$tm_day" = "morning" ] && [ "$WALL_DIR" != "$MR_WALL" ]; then
+				WALL_DIR="$MR_WALL"
+				init_wallpaper_list "$WALL_DIR"
+			fi
+			# check if the wallpaper directory change:
+			if [ "$tmp_walldir" != "$WALL_DIR" ]; then
+				info+=("New wallpaper directory: "$(date +%H:%M)"")
+				info+=("Wallpapers list : /tmp/wallpaper_list.txt")
+			fi
 		fi
 	fi
 
@@ -152,7 +176,8 @@ while true; do
 	info+=("Total wallpapers: $total_files")
 	current_image=$(basename $IMG)
 	caelestia wallpaper -f "$IMG" >/dev/null 2>&1
-	log-to-file $WALL_DIR $current_image info # this call dose not create a copy so the function use the original array
+	log-to-file $WALL_DIR $current_image info $avg # this call dose not create a copy so the function use the original array
+	info=()                                        # reinit dso that array flush every time we log the info to file
 	sleep 350
 
 done
