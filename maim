@@ -1,0 +1,13 @@
+#!/bin/bash
+
+dest="$1"
+
+for fl in $(find . -maxdepth 1 -type f); do
+    ext=$(file $fl | awk '{printf $2}')
+    if [[ $ext == "empty" ]]; then
+        continue
+    fi
+    if [[ $ext == "PNG" ]] || [[ $ext == "JPEG" ]] || [[ $ext == "JPG" ]] || [[ $ext == "GIF" ]] || [[ $ext == "WEBP" ]]; then
+        mv $fl "$dest"
+    fi
+done
