@@ -3,7 +3,7 @@
 # create a executable script (default bash)
 
 declare -r user=$(whoami)
-declare -r sname='nsh'
+declare -r sname='csf'
 
 declare LOCATION="$HOME"/.local/bin/
 declare LIBRARY=${LIBRARY:-'/usr/share/makepkg'}
@@ -29,7 +29,7 @@ Options:
 
 Default Value:
   default directory is: /home/${user}/.local/bin/
-  default file: bash
+  default file extensions: bash (if the given file has no specify extensions)
 EOF
 }
 
@@ -42,7 +42,9 @@ handle_ext() {
 		printf "print('script created')" >"$path"
 		;;
 	'c')
-		echo -e '#include<stdio.h>\nint main(){\nprintf("script created");\nreturn 0;\n}' >"$path"
+		echo -e '#include<stdio.h>\nint main(){\nprintf("file created");\nreturn 0;\n}' >"$path"
+		# compile
+		gcc "$path" -o out 2>/dev/null
 		;;
 	esac
 }
@@ -120,5 +122,5 @@ fi
 
 ff="$LOCATION""$filename"
 
-# all the steps get done in this  function
+# all the steps are been handle by this function
 handle_file $ff $filename
