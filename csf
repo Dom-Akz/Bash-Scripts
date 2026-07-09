@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-declare -r user=$(whoami 2>dev/null)
+declare -r user=$(whoami)
 declare -r sname='csf'
 
 declare LOCATION="$HOME"/.local/bin/
@@ -34,7 +34,7 @@ Hint:
 
 EOF
 }
-
+# add .sh
 handle_ext() {
 	local ext=$1
 	local path=$2

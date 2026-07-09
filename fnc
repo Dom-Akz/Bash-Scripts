@@ -11,12 +11,17 @@ declare -r DIR=(
 
 declare LIST_CONF="/tmp/cmd_name:"
 
+# cut the commande from the file name
+get-cm() {
+	echo $(basename "$LIST_CONF" .fnc | cut -d':' -f2)
+}
+
 # check if command line is valid (exists) or not
 check-cm() {
 	if type -P "$1" >/dev/null 2>&1; then
 		return
 	else
-		echo "$1 not found! (try running with -c)"
+		echo "$(get-cm) not found! (try running with -c)"
 		exit 1
 	fi
 }
@@ -36,8 +41,8 @@ print-files() {
 
 # get the config files and store them in a file (!this function can stop the script):
 get-files() {
-	local com="$1"
-	local file_ext="$2"
+	local com="$(get-cm)"
+	local file_ext="$1"
 	local res=""
 	for dir in "${DIR[@]}"; do
 		# edit this command to get better result
@@ -45,8 +50,7 @@ get-files() {
 		if [ "$?" -eq 1 ]; then
 			continue
 		else
-			echo "$res" >>$LIST_CONF
-			res=""
+			echo "$res" >>"$LIST_CONF"
 		fi
 	done
 	# we can stop here if file is empty
@@ -54,16 +58,35 @@ get-files() {
 		echo "$com : No configurations files found"
 		exit 0
 	fi
+
 	# if flag m is set
 	if $file_ext; then
 		cp $LIST_CONF "/tmp/tmp-$com"
 		cat "/tmp/tmp-$com" | grep -E ".conf|.config|.toml|.json|.sjson" >"$LIST_CONF"
 		rm "/tmp/tmp-$com" 2>/dev/null
+	else
+		# now last step filter for cleaner list
+		filtre
 	fi
 }
 
+#TODO: try to do this in just one grep-cut command
 # delete non conf files (ex: images, videos, document, ...)
-# filtre(){}
+filtre() {
+	local cm=$(get-cm)
+	# create a new file
+	touch /tmp/new_list-"$cm"
+	for fl in $(cat "$LIST_CONF"); do
+		$(echo "$fl" | grep -Eq ".png|.jpg|.jpeg|.webp|.gif|.mp3|.mp4|.pdf|.docx|.pptx")
+		if ! [ $? -eq 0 ]; then
+			# now add the conf file to the new list
+			echo $fl >>/tmp/new_list-"$cm"
+		fi
+	done
+	# now we cp the new list to the og
+	cp /tmp/new_list-"$cm" "$LIST_CONF"
+	rm /tmp/new_list-"$cm"
+}
 
 usage() {
 	cat <<EOF
@@ -137,10 +160,10 @@ main() {
 	fi
 
 	if ! $search_command && ! $can_restore; then
-		check-cm "$com"
+		check-cm
 	fi
 
-	get-files $com $use_cm_ext
+	get-files $use_cm_ext
 	print-files $msg
 }
 
