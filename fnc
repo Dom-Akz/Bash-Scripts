@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
 # list of paths to search for conf files
-declare -r DIR=("$HOME/.config/"
+declare -r DIR=(
+	"$HOME/.config/"
 	"$HOME/"
 	"$HOME/.local/share/"
 	"/etc/"
@@ -21,7 +22,7 @@ check-cm() {
 }
 
 # print all found files
-print() {
+print-files() {
 	local nb=$(cat "$LIST_CONF" | wc -l)
 	local msg=$1
 	echo -e $msg
@@ -37,14 +38,15 @@ print() {
 get-files() {
 	local com="$1"
 	local file_ext="$2"
-	# set the commande
+	local res=""
 	for dir in "${DIR[@]}"; do
-		# u edit this command to get better result
-		res=$(find "$dir""$com" -name ".*" -prune -o -type f -printf 'file:///%p\n' 2>/dev/null)
+		# edit this command to get better result
+		res=$(find "$dir""$com""/" -name ".*" -prune -o -type f -printf 'file:///%p\n' 2>/dev/null)
 		if [ "$?" -eq 1 ]; then
 			continue
 		else
 			echo "$res" >>$LIST_CONF
+			res=""
 		fi
 	done
 	# we can stop here if file is empty
@@ -54,12 +56,13 @@ get-files() {
 	fi
 	# if flag m is set
 	if $file_ext; then
-		cp $LIST_CONF "/tmp/tmp-$com" # find better way
+		cp $LIST_CONF "/tmp/tmp-$com"
 		cat "/tmp/tmp-$com" | grep -E ".conf|.config|.toml|.json|.sjson" >"$LIST_CONF"
+		rm "/tmp/tmp-$com" 2>/dev/null
 	fi
 }
 
-# delete non conf files
+# delete non conf files (ex: images, videos, document, ...)
 # filtre(){}
 
 usage() {
@@ -128,7 +131,7 @@ main() {
 		msg=$(restore)
 	else
 		if [ -f "$LIST_CONF" ]; then
-			print "Aleardy have it (run -r to restore it)\n$msg"
+			print-files "Aleardy have it (run -r to restore it)\n$msg"
 			exit 0
 		fi
 	fi
@@ -138,7 +141,7 @@ main() {
 	fi
 
 	get-files $com $use_cm_ext
-	print $msg
+	print-files $msg
 }
 
 main "$@"

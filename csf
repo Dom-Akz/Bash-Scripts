@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 
-# create a executable script (default bash)
-
-declare -r user=$(whoami)
+declare -r user=$(whoami 2>dev/null)
 declare -r sname='csf'
 
 declare LOCATION="$HOME"/.local/bin/
