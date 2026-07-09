@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # create a executable script (default bash)
 
@@ -30,21 +30,31 @@ Options:
 Default Value:
   default directory is: /home/${user}/.local/bin/
   default file extensions: bash (if the given file has no specify extensions)
+
+Hint:
+  if you create a c/c++ file it will be compile and will found the executable with the same name as the file
+
 EOF
 }
 
 handle_ext() {
 	local ext=$1
 	local path=$2
-	# for any other extension the file will have nothing
+	local outfile=$(basename "$path" ".""$ext") # compile file name
+	# for any other extension the file will be empty
 	case "$ext" in
 	'py')
 		printf "print('script created')" >"$path"
 		;;
 	'c')
-		echo -e '#include<stdio.h>\nint main(){\nprintf("file created");\nreturn 0;\n}' >"$path"
+		echo -e '#include<stdio.h>\nint main(){\n\tprintf("file created");\n\treturn 0;\n}' >"$path"
 		# compile
-		gcc "$path" -o out 2>/dev/null
+		gcc "$path" -o "$outfile" 2>/dev/null
+		;;
+	'cpp')
+		echo -e '#include<iostream>\n\nint main(){\n\tstd::cout << "file created";\n\treturn 0;\n}' >"$path"
+		# compile
+		g++ "$path" -o "$outfile" out 2>/dev/null
 		;;
 	esac
 }
@@ -52,7 +62,7 @@ handle_ext() {
 handle_file() {
 	local full_name="$1"
 	local filename="$2"
-
+	local ext=""
 	if [ -f "$1" ]; then
 		die "File exist! (try different name)"
 	fi
@@ -69,22 +79,25 @@ handle_file() {
 
 	# default extensions
 	else
-		echo -e "#!/bin/bash" "\necho 'script created'" >"$ff"
+		echo -e "#!/usr/bin/env bash" "\necho 'script created'" >"$ff"
 	fi
 
-	# check if the user is root and make the file executable
-	if [ $(ls -ld "$full_name" | awk '{print $3}') != "root" ]; then
-		chmod +x "$full_name"
-	else
-		sudo chmod +x "$full_name"
-	fi
-
-	# open the file
-	if [ $OPEN -eq 1 ]; then
-		if type -P nvim >/dev/null 2>&1; then
-			nvim "$full_name"
+	# skip if the file is c/c++
+	if [ "$ext" != 'c' ] || [ "$ext" != 'cpp' ]; then
+		# check if the user is root and make the file executable
+		if [ $(ls -ld "$full_name" | awk '{print $3}') != "root" ]; then
+			chmod +x "$full_name"
 		else
-			vim "$full_name"
+			sudo chmod +x "$full_name"
+		fi
+
+		# open the file
+		if [ $OPEN -eq 1 ]; then
+			if type -P nvim >/dev/null 2>&1; then
+				nvim "$full_name"
+			else
+				vim "$full_name"
+			fi
 		fi
 	fi
 }

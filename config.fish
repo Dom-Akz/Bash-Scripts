@@ -56,7 +56,6 @@ function dl
 end
 
 
-
 if status is-interactive
     # Starship custom prompt
     starship init fish | source
@@ -69,6 +68,7 @@ if status is-interactive
 
     alias ls 'eza --icons'
     # Aliases
+    alias pamcan pacman
     alias q 'qs -c ii'
     alias c 'clear;fish_greeting'
     alias C 'clear;fish_greeting'
@@ -81,7 +81,8 @@ if status is-interactive
     #alias clean 'find ~/.local/share/chwall// -type f ! -name "Wallpapers-$(date +%d-%m-%y).log" -delete'
     alias dcn 'sudo systemctl stop iwd && sudo systemctl stop NetworkManager'
     alias upcn 'sudo systemctl start iwd && sudo systemctl start NetworkManager'
-    #alias clt 'rm -rI ~/Trash/*'
+    alias mt 'zen-browser WorldCup2026_GroupStage_Morocco.html'    
+    #alias clt 'rm -ri ~/Trash/*'
 
     # pacman and yay : 
     alias update 'sudo pacman -Syu'
@@ -99,11 +100,12 @@ if status is-interactive
     alias suns 'curl wttr.in\?format="%s"' # sunset
 
     
+    
+
     # yt-dlp : 
     alias ytvd 'yt-dlp -t mp4 -o "Videos/%(title)s.%(ext)s" --no-keep-video'
     alias ytad 'yt-dlp -x --audio-format mp3 --audio-quality 0'
     alias yt 'yt-dlp -t mp4 --remote-components ejs:npm -o "Videos/%(title)s.%(ext)s" --no-keep-video'
-
     # Abbrs
     abbr lg 'lazygit'
     abbr gd 'git diff'

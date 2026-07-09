@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # preform the action (move, delete, copy, ...) to all images with in the current dir
 
@@ -10,6 +10,6 @@ for fl in $(find . -maxdepth 1 -type f); do
 		continue
 	fi
 	if [[ $ext == "PNG" ]] || [[ $ext == "JPEG" ]] || [[ $ext == "JPG" ]] || [[ $ext == "GIF" ]] || [[ $ext == "WEBP" ]]; then
-		mv $fl "$dest"
+		mv $fl "$dest" # edit this command
 	fi
 done

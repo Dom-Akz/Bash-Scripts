@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # get date once
 declare date_=$(date +%d-%m-%y)
@@ -80,12 +80,13 @@ log-to-file() {
 
 		local curr_wall="$2" # if the default wall
 		local -n arr=$3      # using the original array
-		local msg="ERROR:NO MESSAGES WAS FOUND"
+		local msg="ERROR:NO MESSAGES WAS FOUND (hint: stop this instance and delete:
+		/tmp/wallpaper_state.txt, /tmp/wallpaper_list.txt)"
 
 		if [ "${#arr[@]}" -gt 0 ]; then   # check if the array is not empty
 			msg=$(printf "%s\n" "${arr[@]}") # joined the array into a string
 		fi
-		[[ $4 == 1 ]] && header="-- The wallpaper is set to avg_wall to change it you need to terminate this instance and run anther one without the -v option --"
+		[[ $4 == 1 ]] && header="-- The wallpaper is set to avg_wall to change it you need to terminate this instance and run another one without the -v option --"
 		echo -e "\n$header\n[$(date)]\nWallpapers Directory: "$dir"\nCurrent Wallpaper: "$curr_wall"\n$msg" >>"$LOG_"
 	fi
 }

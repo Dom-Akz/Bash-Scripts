@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # list of paths to search for conf files
 declare -r DIR=("$HOME/.config/"
@@ -20,10 +20,10 @@ check-cm() {
 	fi
 }
 
+# print all found files
 print() {
 	local nb=$(cat "$LIST_CONF" | wc -l)
 	local msg=$1
-
 	echo -e $msg
 	if [ "$nb" -lt 11 ]; then
 		cat "$LIST_CONF" 2>/dev/null
@@ -39,6 +39,7 @@ get-files() {
 	local file_ext="$2"
 	# set the commande
 	for dir in "${DIR[@]}"; do
+		# u edit this command to get better result
 		res=$(find "$dir""$com" -name ".*" -prune -o -type f -printf 'file:///%p\n' 2>/dev/null)
 		if [ "$?" -eq 1 ]; then
 			continue
@@ -58,13 +59,18 @@ get-files() {
 	fi
 }
 
+# delete non conf files
+# filtre(){}
+
 usage() {
 	cat <<EOF
 Usage : fnc [options] command
--h : display help
--r : restore the configuration files to a file
--c : deep search for configuration files
--m : only search for configuration files with most common extensions (does not support application-specific extensions)
+
+Options:
+  -h : display help
+  -r : restore the configuration files to a file
+  -c : deep search for configuration files (for more specifique search use -m insted)
+  -m : only search for configuration files with most common extensions (does not support application-specific extensions)
 EOF
 }
 
