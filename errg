@@ -2,6 +2,6 @@
 
 declare -r IMG_PATH="/$HOME/Pictures/Wallpapers/Wall/Hyprland.png"
 
-pgrep -x "Wallpapers.sh" && pkill -USR2 "Wallpapers.sh"
+pgrep -f "Wallpapers.sh" && pkill -USR2 -f "Wallpapers.sh"
 
 caelestia wallpaper -f "$IMG_PATH" >/dev/null

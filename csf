@@ -54,6 +54,9 @@ handle_ext() {
 		# compile
 		g++ "$path" -o "$outfile" out 2>/dev/null
 		;;
+	'sh')
+		echo -e '#!/usr/bin/env bash\n\necho "script created"' >"$path"
+		;;
 	esac
 }
 

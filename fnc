@@ -18,7 +18,8 @@ get-cm() {
 
 # check if command line is valid (exists) or not
 check-cm() {
-	if type -P "$1" >/dev/null 2>&1; then
+	echo "$1"
+	if type -p "$(get-cm)" &>/dev/null; then
 		return
 	else
 		echo "$(get-cm) not found! (try running with -c)"
