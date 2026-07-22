@@ -12,7 +12,7 @@ SM_WALL="$HOME/Pictures/Wallpapers/SM"
 RAIN_WALL="$HOME/Pictures/Wallpapers/RAIN"
 VID_WALL="$HOME/Pictures/Wallpapers/VID_WALL/"
 FEM_WALL="$HOME/Pictures/Wallpapers/FEM-WALL/"
-AVG_WALL="$HOME/Pictures/Wallpapers/AVG_WALL/"
+AVG_WALL="$HOME/Pictures/WALL/walls/"
 
 LIST_FILE="/tmp/wallpaper_list.txt"
 STATE_FILE="/tmp/wallpaper_state.txt"

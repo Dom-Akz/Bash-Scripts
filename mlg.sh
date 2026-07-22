@@ -8,12 +8,12 @@ nb=0
 
 while inotifywait -e modify "$log"; do
 	msg=""
-	# get only the new lines (nombre des lignes ajouter)
-	msg=$(tail -n (number of line add to file starting from the nb var) "$log" | grep -En 'ERROR|Warning') # get only the firt error
+	# get only the new lines
+	msg=$(tail -n "$log" | grep -En 'ERROR|Warning') # get only the firt error
 	if ! [ -z "$msg" ]; then
-		nb=$(echo "$msg" | cut -d: -f1 | head -n 1) # set the number of first error line
-		cn=$(echo "$msg" | wc -l)                   # nb all error
-		notify-send "$msg"
-		notify-send "There is $cn more error check log $log"
+		nb=$(echo "$msg" | cut -d: -f1 | head -n 1)                               # set the number of first error line
+		cn=$(echo "$msg" | wc -l)                                                 # nb all error
+		notify-send -a Wallpapers -u normal "$msg"                                # send error notif
+		notify-send -a Wallpapers -u low "There is $cn more error check log $log" # send info notif
 	fi
 done

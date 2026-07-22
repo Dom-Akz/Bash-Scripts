@@ -94,7 +94,7 @@ handle_file() {
 
 		# open the file
 		if [ $OPEN -eq 1 ]; then
-			if type -P nvim >/dev/null 2>&1; then
+			if type -p nvim >/dev/null 2>&1; then
 				nvim "$full_name"
 			else
 				vim "$full_name"
