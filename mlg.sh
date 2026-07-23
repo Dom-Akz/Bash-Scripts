@@ -33,5 +33,4 @@ while inotifywait -e modify "$log"; do
 			fi
 		done
 	fi
-
 done
