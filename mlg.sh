@@ -10,17 +10,18 @@ while inotifywait -e modify "$log"; do
 	if [ "$nb" -eq 0 ]; then
 		msg=$(grep -Eni 'ERROR|Warning' "$log")
 		if ! [ -z "$msg" ]; then
-			nb=$(echo "$msg" | cut -d: -f1 | tail -n 1)                               # set the number of last error line
-			cn=$(echo "$msg" | wc -l)                                                 # nombers of errors
-			msg=$(echo "$msg" | cut -d: -f2 | head -n 1)                              # get the first error message
-			notify-send -a Wallpapers -u normal "$msg"                                # send error notif
-			notify-send -a Wallpapers -u low "There is $cn more error check log $log" # send info notif
+			nb=$(echo "$msg" | cut -d: -f1 | tail -n 1)
+			# set the number of last error line
+			cn=$(echo "$msg" | wc -l)                                                                    # nombers of errors
+			msg=$(echo "$msg" | cut -d: -f2 | head -n 1)                                                 # get the first error message
+			notify-send -a Wallpapers -u normal "$msg"                                                   # send error notif
+			[[ $cn -gt 1 ]] && notify-send -a Wallpapers -u low "There is $cn more error check log $log" # send info notif
 		fi
 	fi
 
 	if [ "$nb" != 0 ]; then
 		is_notfiy=0
-		for line in $(grep -Eni "ERROR|Warning" "$log"); do
+		while read -r line; do
 			new_nb=$(echo "$line" | cut -d: -f1)
 
 			# start searching from here for any new errors
@@ -32,6 +33,6 @@ while inotifywait -e modify "$log"; do
 					is_notfiy=1
 				fi
 			fi
-		done
+		done <"$log"
 	fi
 done
