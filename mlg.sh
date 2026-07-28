@@ -8,7 +8,7 @@ nb=0
 while inotifywait -e modify "$log"; do
 	# only getting once in this condition every first time the scrtipt is running
 	if [ "$nb" -eq 0 ]; then
-		msg=$(grep -Eni 'ERROR|Warning' "$log")
+		msg=$(grep -Eni 'Error|err|warn|exception|fatal|Warning' "$log")
 		if ! [ -z "$msg" ]; then
 			nb=$(echo "$msg" | cut -d: -f1 | tail -n 1)
 			# set the number of last error line
