@@ -38,7 +38,8 @@ EOF
 handle_ext() {
 	local ext=$1
 	local path=$2
-	local outfile=$(basename "$path" ".""$ext") # compile file name
+	local outfile=$(basename "$path" ".""$ext")
+	local bdir=$(dirname $path)
 	# for any other extension the file will be empty
 	case "$ext" in
 	'py')
@@ -52,7 +53,7 @@ handle_ext() {
 	'cpp')
 		echo -e '#include<iostream>\n\nint main(){\n\tstd::cout << "file created";\n\treturn 0;\n}' >"$path"
 		# compile
-		g++ "$path" -o "$outfile" out 2>/dev/null
+		g++ "$path" -o "$bdir""/""$outfile" 2>/dev/null
 		;;
 	'sh')
 		echo -e '#!/usr/bin/env bash\n\necho "script created"' >"$path"

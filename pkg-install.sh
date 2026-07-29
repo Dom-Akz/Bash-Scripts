@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Fake package install simulator with progress bar
-# Usage: ./fake-install.sh -d <minutes> -s <size> -v <version> <package-name>
+# Fake package install simulator with progress bar (this is ai generated btw)
+# Usage: ./pkg-install.sh -d <minutes> -s <size> -v <version> <package-name>
 
 # Function to simulate a delay with progress bar
 progress_delay() {

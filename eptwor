@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-# Simply move to the ! first !  not acitve workspace (no window open)
+# Simply move to the first not acitve workspace (made for hyprland)
 
 # this take all the active workspaces id and sort them
 activework_space=$(hyprctl workspaces -j | jq ".[].id" | sort) # output : 1 2 3 ...
@@ -21,5 +21,5 @@ for val in $activework_space; do
 	fi
 done
 
-hyprctl dispatch workspace "$mp" -q # move to workspace with id $mp
+hyprctl dispatch workspace "$mp" -q # move to the empty workspace
 exit 0
