@@ -86,7 +86,6 @@ log-to-file() {
 		if [ "${#arr[@]}" -gt 0 ]; then   # check if the array is not empty
 			msg=$(printf "%s\n" "${arr[@]}") # joined the array into a string
 		fi
-		[[ $4 == 1 ]] && header="-- The wallpaper is set to avg_wall to change it you need to terminate this instance and run another one without the -v option --"
 		echo -e "\n$header\n[$(date)]\nWallpapers Directory: "$dir"\nCurrent Wallpaper: "$curr_wall"\n$msg" >>"$LOG_"
 	fi
 }
@@ -101,6 +100,7 @@ avg=0
 last_run=0
 WALL_DIR="$MR_WALL"
 info=()
+systemctl --user start Wallpapers.service
 
 # check if the script is running and get the start run time
 run_time=$(ps aux | grep .local/bin/changeWall.sh | awk 'NR==1 {print $9}')
@@ -119,6 +119,8 @@ done
 if [ $avg == 1 ]; then
 	WALL_DIR="$AVG_WALL"
 	init_wallpaper_list "$AVG_WALL"
+	info+=("The wallpaper is set to avg_wall to change it you need to terminate this instance and run another one without the -v option")
+
 fi
 
 [ ! -f "$LIST_FILE" ] || [ ! -s "$LIST_FILE" ] && init_wallpaper_list "$MR_WALL"
@@ -132,7 +134,7 @@ while true; do
 		info+=("Start runnig at: $run_time")
 		run_time=""
 	fi
-	# skip if the script execute with -v option and stick with the avg_wall only
+	# skip if the script execute with -v option (no wall dir change)
 	if [ $avg == 0 ]; then
 		# every hour
 		if [ $((current_time - last_run)) -ge 3600 ]; then
@@ -156,7 +158,7 @@ while true; do
 			fi
 			# check if the wallpaper directory change:
 			if [ "$tmp_walldir" != "$WALL_DIR" ]; then
-				info+=("New wallpaper directory: "$(date +%H:%M)"")
+				info+=("New wallpaper directory: $(date +%H:%M)")
 				info+=("Wallpapers list : /tmp/wallpaper_list.txt")
 			fi
 		fi
@@ -178,7 +180,7 @@ while true; do
 	current_image=$(basename $IMG)
 	caelestia wallpaper -f "$IMG" >/dev/null 2>&1                # set the wallpaper
 	notify-send -a Wallpapers -u normal "Wallpaper change: $IMG" # notify the user after changing the wallpaper
-	log-to-file $WALL_DIR $current_image info $avg               # this call dose not create a copy so the function use the original array
+	log-to-file $WALL_DIR $current_image info                    # this call dose not create a copy so the function use the original array
 	info=()                                                      # reinit dso that array flush every time we log the info to file
 	sleep 350
 
