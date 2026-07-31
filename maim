@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-# preform the action (move, delete, copy, ...) to all images with in the current dir
+# preform the action (move, delete, copy) to all images with in the current dir
+
+# TODO: add src dir + specify action/file type(img, audio, video)
 
 dest="$1"
 

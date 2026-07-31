@@ -3,8 +3,6 @@
 # get date once
 declare date_=$(date +%d-%m-%y)
 
-SWITCH_SCRIPT="$HOME/.config/quickshell/ii/scripts/colors/switchwall.sh"
-
 # wallpapers
 MR_WALL="$HOME/Pictures/Wallpapers/MR_WALL"
 NG_WALL="$HOME/Pictures/Wallpapers/NG_WALL"
@@ -128,7 +126,10 @@ fi
 while true; do
 
 	current_time=$(date +%s)
-
+	if [ "$date_" != $(date +%d-%m-%y) ]; then
+		date_=$(date +%d-%m-%y)
+		LOG_="$HOME/.local/share/chwall/Wallpapers-$date_.log"
+	fi
 	# check if run_time is set
 	if [[ -n $run_time ]]; then
 		info+=("Start runnig at: $run_time")
