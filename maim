@@ -2,16 +2,16 @@
 
 # preform the action (move, delete, copy) to all images with in the current dir
 
-# TODO: add src dir + specify action/file type(img, audio, video)
+src="$1"
+dest="$2"
 
-dest="$1"
-
-for fl in $(find . -maxdepth 1 -type f); do
+for fl in $(find "$src" -maxdepth 1 -type f); do
 	ext=$(file $fl | awk '{printf $2}')
+	echo "$fl"
 	if [[ $ext == "empty" ]]; then
 		continue
 	fi
 	if [[ $ext == "PNG" ]] || [[ $ext == "JPEG" ]] || [[ $ext == "JPG" ]] || [[ $ext == "GIF" ]] || [[ $ext == "WEBP" ]]; then
-		mv $fl "$dest"
+		rm $fl
 	fi
 done
