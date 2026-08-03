@@ -4,7 +4,7 @@
 # edit the disk /dev/nvme0n1p2 to you're specifique device
 # if the /tmp/cdc.txt change befor the second time you run the script it will not work
 
-file="/tmp/cdc.txt"
+file="/home/soufiane/.local/share/cdc.txt"
 
 if [ ! -f "$file" ] || [ ! -s "$file" ]; then
 	prev=$(df -B M /dev/nvme0n1p2 | awk '{printf $3}' | tr -d -c '0-9')
