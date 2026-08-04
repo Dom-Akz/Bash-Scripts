@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# check if the image is upscale (the hard coded value is for my monitor)
+
 image="$1"
 res=$(exiftool "$image" | grep "Image Size" | cut -d: -f2)
 

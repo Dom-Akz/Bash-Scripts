@@ -179,10 +179,10 @@ while true; do
 
 	info+=("Total wallpapers: $total_files")
 	current_image=$(basename $IMG)
-	caelestia wallpaper -f "$IMG" >/dev/null 2>&1                # set the wallpaper
-	notify-send -a Wallpapers -u normal "Wallpaper change: $IMG" # notify the user after changing the wallpaper
-	log-to-file $WALL_DIR $current_image info                    # this call dose not create a copy so the function use the original array
-	info=()                                                      # reinit dso that array flush every time we log the info to file
+	caelestia wallpaper -f "$IMG" >/dev/null 2>&1 # set the wallpaper
+	$(upscale.sh "$IMG")                          # check if the image is upscale (no need to check if the script exist or not)
+	log-to-file $WALL_DIR $current_image info     # this call dose not create a copy so the function use the original array
+	info=()                                       # reinit dso that array flush every time we log the info to file
 	sleep 350
 
 done
