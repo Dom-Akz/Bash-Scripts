@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 
+# monitor a log file and send notifications if any new error occur in log
+
 # path to the log file (if the path is worng inotifywait will raise the error)
 log="/home/soufiane/.local/share/chwall/Wallpapers-$(date +%d-%m-%y).log"
 
-nb=0
+nb=0 # hold the last error line number
 
 while inotifywait -e modify "$log"; do
 	# only getting once in this condition every time the scrtipt is running

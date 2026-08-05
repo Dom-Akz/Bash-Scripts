@@ -30,8 +30,7 @@ check-cm() {
 # print all found files
 print-files() {
 	local nb=$(cat "$LIST_CONF" | wc -l)
-	local msg=$1
-	echo -e $msg
+	echo "Possible locations are:"
 	if [ "$nb" -lt 11 ]; then
 		cat "$LIST_CONF" 2>/dev/null
 	else
@@ -78,8 +77,8 @@ filtre() {
 	# create a new file
 	touch /tmp/new_list-"$cm"
 	for fl in $(cat "$LIST_CONF"); do
-		$(echo "$fl" | grep -Eq ".png|.jpg|.jpeg|.webp|.gif|.mp3|.mp4|.pdf|.docx|.pptx")
-		if ! [ $? -eq 0 ]; then
+		$(echo "$fl" | grep -Eq ".png|.jpg|.jpeg|.webp|.gif|.mp3|.mp4|.pdf|.docx|.doc|.pptx")
+		if [ ! $? -eq 0 ]; then
 			# now add the conf file to the new list
 			echo $fl >>/tmp/new_list-"$cm"
 		fi
@@ -96,8 +95,8 @@ Usage : fnc [options] command
 Options:
   -h : display help
   -r : restore the configuration files to a file
-  -c : deep search for configuration files (for more specifique search use -m insted)
-  -m : only search for configuration files with most common extensions (does not support application-specific extensions)
+  -c : deep search for configuration files
+  -m : only search for configuration files with most common extensions (does not support app-specific extensions)
 EOF
 }
 
@@ -141,7 +140,6 @@ main() {
 
 	shift $((OPTIND - 1))
 	local com="$1"
-	local msg="Possible locations are:"
 	# set file name :
 	LIST_CONF="$LIST_CONF$com.fnc"
 
@@ -152,10 +150,11 @@ main() {
 	fi
 
 	if $can_restore; then
-		msg=$(restore)
+		restore
 	else
 		if [ -f "$LIST_CONF" ]; then
-			print-files "Aleardy have it (run -r to restore it)\n$msg"
+			echo "Aleardy have it (run -r to restore it)"
+			print-files
 			exit 0
 		fi
 	fi
@@ -165,7 +164,7 @@ main() {
 	fi
 
 	get-files $use_cm_ext
-	print-files $msg
+	print-files
 }
 
 main "$@"

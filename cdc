@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 
-# get the exact change in disk space after adding or removing anything from /dev/nvme0n1p2
+# calculate the change is disk (first run: current space disk, second run: calculate disk change)
 # edit the disk /dev/nvme0n1p2 to you're specifique device
-# if the /tmp/cdc.txt change befor the second time you run the script it will not work
 
 file="/home/soufiane/.local/share/cdc.txt"
 
