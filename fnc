@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+#
+
 # list of paths to search for conf files
 declare -r DIR=(
 	"$HOME/.config/"
@@ -78,10 +80,7 @@ filtre() {
 	touch /tmp/new_list-"$cm"
 	for fl in $(cat "$LIST_CONF"); do
 		$(echo "$fl" | grep -Eq ".png|.jpg|.jpeg|.webp|.gif|.mp3|.mp4|.pdf|.docx|.doc|.pptx")
-		if [ ! $? -eq 0 ]; then
-			# now add the conf file to the new list
-			echo $fl >>/tmp/new_list-"$cm"
-		fi
+		[[ ! $? -eq 0 ]] && echo $fl >>/tmp/new_list-"$cm" # now add the conf file to the new list
 	done
 	# now we cp the new list to the og
 	cp /tmp/new_list-"$cm" "$LIST_CONF"
@@ -90,9 +89,12 @@ filtre() {
 
 usage() {
 	cat <<EOF
-Usage : fnc [options] command
+NAME
+	find configurations files of a given name
 
-Options:
+USAGE : fnc [options] command
+
+OPTIONS:
   -h : display help
   -r : restore the configuration files to a file
   -c : deep search for configuration files
@@ -108,6 +110,7 @@ restore() {
 		echo "Warning: file not found. Nothing has been restored."
 	fi
 }
+# now add the conf file to the new list
 
 main() {
 	# init :
@@ -131,8 +134,7 @@ main() {
 			exit 0
 			;;
 		\*)
-			echo "invalid option -$opt"
-			usage
+			echo -e "Usage: fnc [OPTIONS]... NAME\nTry 'fnc -h' for more information."
 			exit 1
 			;;
 		esac
@@ -143,20 +145,19 @@ main() {
 	# set file name :
 	LIST_CONF="$LIST_CONF$com.fnc"
 
-	if [ -z "$com" ]; then
-		echo "no command provide"
-		usage
-		exit 2
-	fi
+	[[ -z "$com" ]] && {
+		echo -e "Usage: fnc [OPTIONS]... NAME\nTry 'fnc -h' for more information."
+		exit 1
+	}
 
 	if $can_restore; then
 		restore
 	else
-		if [ -f "$LIST_CONF" ]; then
+		[[ -f "$LIST_CONF" ]] && {
 			echo "Aleardy have it (run -r to restore it)"
 			print-files
 			exit 0
-		fi
+		}
 	fi
 
 	if ! $search_command && ! $can_restore; then

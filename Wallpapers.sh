@@ -71,7 +71,7 @@ fem-time() {
 
 log-to-file() {
 	if [ -z "$1" ] || [ -z "$2" ]; then
-		echo -e "\n[$(date)]\n WARNING: no information was given" >>$LOG_
+		echo -e "\n[$(date)]\nERROR: No information found" >>$LOG_
 	else
 		local dir="$1"
 		local header=""
@@ -81,9 +81,8 @@ log-to-file() {
 		local msg="ERROR:NO MESSAGES WAS FOUND (hint: stop this instance and delete:
 		/tmp/wallpaper_state.txt, /tmp/wallpaper_list.txt)"
 
-		if [ "${#arr[@]}" -gt 0 ]; then   # check if the array is not empty
-			msg=$(printf "%s\n" "${arr[@]}") # joined the array into a string
-		fi
+		# check if the array is not empty
+		[[ "${#arr[@]}" -gt 0 ]] && msg=$(printf "%s\n" "${arr[@]}") # joined the array into a string
 		echo -e "\n$header\n[$(date)]\nWallpapers Directory: "$dir"\nCurrent Wallpaper: "$curr_wall"\n$msg" >>"$LOG_"
 	fi
 }
@@ -98,6 +97,7 @@ avg=0
 last_run=0
 WALL_DIR="$MR_WALL"
 info=()
+touch "$LOG_"
 systemctl --user start Wallpapers.service
 
 # check if the script is running and get the start run time
@@ -114,12 +114,11 @@ while getopts "v" opt; do
 	esac
 done
 
-if [ $avg == 1 ]; then
+[[ $avg == 1 ]] && {
 	WALL_DIR="$AVG_WALL"
 	init_wallpaper_list "$AVG_WALL"
 	info+=("The wallpaper is set to avg_wall to change it you need to terminate this instance and run another one without the -v option")
-
-fi
+}
 
 [ ! -f "$LIST_FILE" ] || [ ! -s "$LIST_FILE" ] && init_wallpaper_list "$MR_WALL"
 
@@ -158,10 +157,10 @@ while true; do
 				init_wallpaper_list "$WALL_DIR"
 			fi
 			# check if the wallpaper directory change:
-			if [ "$tmp_walldir" != "$WALL_DIR" ]; then
+			[[ "$tmp_walldir" != "$WALL_DIR" ]] && {
 				info+=("New wallpaper directory: $(date +%H:%M)")
 				info+=("Wallpapers list : /tmp/wallpaper_list.txt")
-			fi
+			}
 		fi
 	fi
 
@@ -172,17 +171,19 @@ while true; do
 	IMG=$(sed -n "${next_line}p" "$LIST_FILE")
 	echo "$((current_index + 1))" >"$STATE_FILE"
 	wall_exists=$(find "$WALL_DIR" -wholename "$IMG" | wc -l)
-	if [[ $wall_exists -eq 0 ]]; then
+
+	[[ $wall_exists -eq 0 ]] && {
 		IMG="$DEFAULT_IMG"
-		info+=("Using default image: $DEFAULT_IMG")
-	fi
+		info+=("Warning: Using default image: $DEFAULT_IMG")
+	}
 
 	info+=("Total wallpapers: $total_files")
 	current_image=$(basename $IMG)
+
 	caelestia wallpaper -f "$IMG" >/dev/null 2>&1 # set the wallpaper
 	$(upscale.sh "$IMG")                          # check if the image is upscale (no need to check if the script exist or not)
 	log-to-file $WALL_DIR $current_image info     # this call dose not create a copy so the function use the original array
-	info=()                                       # reinit dso that array flush every time we log the info to file
+	info=()                                       # reinit so that array flush every time we log the info to file
 	sleep 350
 
 done
