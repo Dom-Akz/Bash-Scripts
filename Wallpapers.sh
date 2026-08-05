@@ -71,14 +71,14 @@ fem-time() {
 
 log-to-file() {
 	if [ -z "$1" ] || [ -z "$2" ]; then
-		echo -e "\n[$(date)]\nERROR: No information found" >>$LOG_
+		echo -e "\n[$(date)]\n[ERROR] No information found" >>$LOG_
 	else
 		local dir="$1"
 		local header=""
 
 		local curr_wall="$2" # if the default wall
 		local -n arr=$3      # using the original array
-		local msg="ERROR:NO MESSAGES WAS FOUND (hint: stop this instance and delete:
+		local msg="[ERROR] NO MESSAGES WAS FOUND (hint: stop this instance and delete:
 		/tmp/wallpaper_state.txt, /tmp/wallpaper_list.txt)"
 
 		# check if the array is not empty
@@ -98,7 +98,7 @@ last_run=0
 WALL_DIR="$MR_WALL"
 info=()
 touch "$LOG_"
-systemctl --user start Wallpapers.service
+systemctl --user restart Wallpapers.service
 
 # check if the script is running and get the start run time
 run_time=$(ps aux | grep .local/bin/changeWall.sh | awk 'NR==1 {print $9}')
@@ -125,7 +125,7 @@ done
 while true; do
 
 	current_time=$(date +%s)
-	if [ "$date_" != $(date +%d-%m-%y) ]; then
+	if [ "$date_" != "$(date +%d-%m-%y)" ]; then
 		date_=$(date +%d-%m-%y)
 		LOG_="$HOME/.local/share/chwall/Wallpapers-$date_.log"
 	fi
@@ -174,7 +174,7 @@ while true; do
 
 	[[ $wall_exists -eq 0 ]] && {
 		IMG="$DEFAULT_IMG"
-		info+=("Warning: Using default image: $DEFAULT_IMG")
+		info+=("[Warning] Using default image: $DEFAULT_IMG")
 	}
 
 	info+=("Total wallpapers: $total_files")
