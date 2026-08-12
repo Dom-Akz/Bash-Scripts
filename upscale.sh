@@ -9,5 +9,5 @@ x=$(echo "$res" | tr -d '[:space:]' | cut -dx -f1)
 y=$(echo "$res" | tr -d '[:space:]' | cut -dx -f2)
 
 if [ "$x" -lt 1960 ] && [ "$y" -lt 1080 ]; then
-	notify-send -a Wallpapers -u normal "Image upscale"
+	notify-send -a Wallpapers -u normal "Image upscale $1"
 fi

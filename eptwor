@@ -8,7 +8,7 @@ activework_space=$(hyprctl workspaces -j | jq ".[].id" | sort) # output : 1 2 3 
 # check if the first workspace is not active
 $(echo "$activework_space" | grep -qwc 1)
 if [ $? -eq 1 ]; then
-	hyprctl dispatch workspace 1 -q # move to workspace 1
+	hyprctl dispatch workspace 1 -q
 	exit 0
 fi
 
@@ -16,10 +16,10 @@ fi
 for val in $activework_space; do
 	mp=$((val + 1))
 	$(echo $activework_space | grep -qwc "$mp") # test if the list have the id or not
-	if [ $? -eq 1 ]; then                       # if the id dose not exists
+	if [ $? -eq 1 ]; then
 		break
 	fi
 done
 
-hyprctl dispatch workspace "$mp" -q # move to the empty workspace
+hyprctl dispatch workspace "$mp" -q
 exit 0

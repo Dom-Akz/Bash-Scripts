@@ -1,14 +1,11 @@
-#!/bin/env bash
+#!/usr/bin/env bash
 
-# use the /sys
 disable-usb() {
 	for usb in $(find /sys/bus/usb/devices/ -name "*usb*"); do
-		local location="$usb/authorized"
-		echo "0" | sudo tee "$location"
+		echo "0" | sudo tee "$usb/authorized"
 	done
 }
 
-# use class/drm
 disable-hdmi() {
 	# check if the hdmi is active
 	for hdmi in $(find /sys/class/drm/ -name "*HDMI*"); do
@@ -22,19 +19,8 @@ disable-hdmi() {
 	return 1
 }
 
-main() {
+disable-usb
+[[ $? -eq 1 ]] && echo "Error durning usb port disabling"
 
-	#initilaize the pci bus :
-	#echo '1' | sudo tee /sys/bus/pci/resan
-
-	#com=$(lspci | grep -E "USB|Audio|VGA|HDMI|Display|Ethernet|Network|Thunderbolt|FireWire|IEEE 1394
-	#|Serial Port|Parallel Port|eSATA|Card Reader|Modem|Bluetooth|WiFi|WLAN|Graphics|3D|Video")
-	disable-usb
-
-	disable-hdmi
-	if [ $? -eq 1 ]; then
-		echo "warning:No HDMI output is connected"
-	fi
-}
-
-main "$@"
+disable-hdmi
+[[ $? -eq 1 ]] && echo "Warning:No HDMI output is connected"

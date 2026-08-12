@@ -1,7 +1,0 @@
-#!/usr/bin/env bash
-
-declare -r IMG_PATH="/home/soufiane/Pictures/WALL/walls/astronaut.png"
-
-pgrep -f "Wallpapers.sh" && pkill -USR2 -f "Wallpapers.sh" && systemctl --user stop Wallpapers.service
-
-caelestia wallpaper -f "$IMG_PATH" >/dev/null
