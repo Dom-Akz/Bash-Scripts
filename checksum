@@ -4,7 +4,7 @@
 
 declare -r sname="checksum"
 declare -r manifest="$(pwd)/manifest"
-declare -r logpath="$HOME/.local/share/checksum/log-$(date +%d-%m-%y).log"
+declare -r logpath="$HOME/.local/share/checksum/chechsum-log-$(date +%d-%m-%y).log"
 
 # load messages lib
 declare LIBRARY=${LIBRARY:-'/usr/share/makepkg'}
@@ -32,7 +32,7 @@ Options:
   -c <filename>: verfiez file checksum
 
 Note:
-    
+  you can view log here: ${logpath} 
   use only this hash algorithme: sha-1, sha-256, sha-512 
 
 EOF
@@ -51,15 +51,17 @@ generate() {
     # one file
     if [ -a "$path" ]; then
         "$hash_algo" $path >>"$manifest" # hash_algo hold the command ex: sha256sum
-        checksum=$(cat "$manifest" | awk '{print $1}')
-        log "[$(date)]: new checksum created: $checksum $path"
+        checksum=$(cat "$manifest" | grep -E "$path" | awk '{print $1}')
+        log "[$(date)]: created new checksum for: $path"
+        echo "$checksum $path"
     # dir
     elif [ -d "$path" ]; then
         log "[$(date)]: start creating checksum for all file inside directory: "$path""
         for file in $(find "$path" -maxdepth 1 -type f); do
             "$hash_algo" "$file" >>"$manifest"
-            checksum=$(cat $manifest | awk '{print $1}')
-            log "[$(date)]: new checksum created: $checksum $path"
+            checksum=$(cat $manifest | grep -E "$file" | awk '{print $1}')
+            log "[$(date)]: created new checksum for: $path"
+            echo "$checksum $file"
         done
     fi
 
@@ -111,7 +113,7 @@ main() {
 
     [[ ! -e "$manifest" ]] && {
         touch $manifest
-        log "[$(date)] create manifest file: $manifest"
+        log "[$(date)]: create manifest file: $manifest"
     }
 
     # check if file exsist
