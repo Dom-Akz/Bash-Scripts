@@ -4,7 +4,7 @@
 
 declare -r sname="checksum"
 declare -r manifest="$(pwd)/manifest"
-declare -r logpath="$(pwd)/log-$(date).log"
+declare -r logpath="$HOME/.local/share/checksum/log-$(date +%d-%m-%y).log"
 
 # load messages lib
 declare LIBRARY=${LIBRARY:-'/usr/share/makepkg'}
@@ -16,16 +16,15 @@ log() {
 }
 
 die() {
-    colorise
+    colorize
     error "$1"
+    log "[$(date)]: $1"
     exit 1
 }
 
-sname='checksum'
-
 help() {
     cat <<EOF
-Usage ${name} <checksum> <filename> [OPTIONS]
+Usage ${sname} <checksum> <filename> [OPTIONS]
 
 Options:
 
@@ -37,17 +36,6 @@ Note:
   use only this hash algorithme: sha-1, sha-256, sha-512 
 
 EOF
-}
-
-# create manifest file or insert new medatat format (<checksum> <filename>)
-manifest() {
-    [[ ! -e "$manifest" ]] && {
-        touch $manifest
-        log "[$(date)] create manifest file: $manifest"
-        return 0
-    }
-
-    echo -e "\n$1" >>$manifest
 }
 
 generate() {
@@ -62,13 +50,17 @@ generate() {
 
     # one file
     if [ -a "$path" ]; then
-        out=$("$hash_algo" $path)
-        checksum=$(echo "$out" | awk '{print $1}')
-        manifest $out
-        log "new checksum created: $checksum $path"
+        "$hash_algo" $path >>"$manifest" # hash_algo hold the command ex: sha256sum
+        checksum=$(cat "$manifest" | awk '{print $1}')
+        log "[$(date)]: new checksum created: $checksum $path"
     # dir
-    else
-
+    elif [ -d "$path" ]; then
+        log "[$(date)]: start creating checksum for all file inside directory: "$path""
+        for file in $(find "$path" -maxdepth 1 -type f); do
+            "$hash_algo" "$file" >>"$manifest"
+            checksum=$(cat $manifest | awk '{print $1}')
+            log "[$(date)]: new checksum created: $checksum $path"
+        done
     fi
 
 }
@@ -91,7 +83,6 @@ main() {
             die "Invalid options (use $sname -h for help)"
             ;;
         esac
-        local checksum=$()
 
     done
 
@@ -100,19 +91,16 @@ main() {
     hash_algo="$1"
     filename="$2"
 
-    # check manifest file
-    [[ ! -e "$manifest" ]] && manifest 1
-
     # check if hash_algo is valid
 
     case "$hash_algo" in
-    sha1)
+    'sha1')
         hash_algo="sha1sum"
         ;;
-    sha256)
+    'sha256')
         hash_algo="sha256sum"
         ;;
-    sha512)
+    'sha512')
         hash_algo="sha512sum"
         ;;
     \*)
@@ -121,12 +109,12 @@ main() {
 
     esac
 
+    [[ ! -e "$manifest" ]] && {
+        touch $manifest
+        log "[$(date)] create manifest file: $manifest"
+    }
+
     # check if file exsist
-
-    [[ ! -e "$filename" ]] && die "$filename: file does not exsist"
-
-    [[ ! -d "$filename" ]] && die "$filename: directory does not exsist"
-
     generate $hash_algo $filename
 
 }
