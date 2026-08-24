@@ -27,7 +27,7 @@ Options:
 
 Default Value:
   default directory is: /home/${user}/.local/bin/
-  default file extensions: bash (if the given file has no specify extensions)
+  default file extensions: bash 
 
 Hint:
   if you create a c/c++ file it will be compile and will found the executable with the same name as the file

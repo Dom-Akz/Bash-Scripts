@@ -1,0 +1,134 @@
+#!/usr/bin/env bash
+
+# generate / verifez checksum
+
+declare -r sname="checksum"
+declare -r manifest="$(pwd)/manifest"
+declare -r logpath="$(pwd)/log-$(date).log"
+
+# load messages lib
+declare LIBRARY=${LIBRARY:-'/usr/share/makepkg'}
+source "$LIBRARY"/util/message.sh
+
+log() {
+    [[ ! -e "$logpath" ]] && touch "$logpath"
+    echo -e "$1" >>"$logpath"
+}
+
+die() {
+    colorise
+    error "$1"
+    exit 1
+}
+
+sname='checksum'
+
+help() {
+    cat <<EOF
+Usage ${name} <checksum> <filename> [OPTIONS]
+
+Options:
+
+  -h: display this help 
+  -c <filename>: verfiez file checksum
+
+Note:
+    
+  use only this hash algorithme: sha-1, sha-256, sha-512 
+
+EOF
+}
+
+# create manifest file or insert new medatat format (<checksum> <filename>)
+manifest() {
+    [[ ! -e "$manifest" ]] && {
+        touch $manifest
+        log "[$(date)] create manifest file: $manifest"
+        return 0
+    }
+
+    echo -e "\n$1" >>$manifest
+}
+
+generate() {
+    local hash_algo=$1
+    local path=$2
+    local checksum=""
+
+    # check if the hash algo exsist
+    if ! type -p "$hash_algo" &>/dev/null; then
+        die "$has_aglo command not found"
+    fi
+
+    # one file
+    if [ -a "$path" ]; then
+        out=$("$hash_algo" $path)
+        checksum=$(echo "$out" | awk '{print $1}')
+        manifest $out
+        log "new checksum created: $checksum $path"
+    # dir
+    else
+
+    fi
+
+}
+
+# verfiez() {}
+
+main() {
+    verf=0
+
+    while getopts "hc:" opt; do
+        case "$opt" in
+        h)
+            help
+            exit 0
+            ;;
+        c)
+            verf=1
+            ;;
+        \*)
+            die "Invalid options (use $sname -h for help)"
+            ;;
+        esac
+        local checksum=$()
+
+    done
+
+    shift $((OPTIND - 1))
+
+    hash_algo="$1"
+    filename="$2"
+
+    # check manifest file
+    [[ ! -e "$manifest" ]] && manifest 1
+
+    # check if hash_algo is valid
+
+    case "$hash_algo" in
+    sha1)
+        hash_algo="sha1sum"
+        ;;
+    sha256)
+        hash_algo="sha256sum"
+        ;;
+    sha512)
+        hash_algo="sha512sum"
+        ;;
+    \*)
+        die "hash aglorithme not in (sha1, sha256, sha512)"
+        ;;
+
+    esac
+
+    # check if file exsist
+
+    [[ ! -e "$filename" ]] && die "$filename: file does not exsist"
+
+    [[ ! -d "$filename" ]] && die "$filename: directory does not exsist"
+
+    generate $hash_algo $filename
+
+}
+
+main "$@"

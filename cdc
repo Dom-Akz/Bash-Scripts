@@ -11,7 +11,6 @@ else
 	curr=$(df -B M /dev/nvme0n1p2 | awk '{printf $3}' | tr -d -c '0-9')
 	prev=$(cat $file)
 	res=$((curr - prev))
-	res=1002
 	if [ $res -gt 1000 ]; then
 		res=$((res / 1000))
 		printf "change in disk is: %'dG" $res
