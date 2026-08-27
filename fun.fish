@@ -1,3 +1,5 @@
+# THIS IS ALL MY FISH FUNCTIONS
+
 function clg
     set filename Wallpapers-(date +%d-%m-%y).log 
     tail -n 50 $argv[1] /home/soufiane/.local/share/chwall/$filename | bat -l log --file-name /home/soufiane/.local/share/chwall/$filename
@@ -70,6 +72,7 @@ function dec
      openssl enc -d -aes-256-cbc -pbkdf2 -in $argv[1] -out $argv[2] 
 end
 
-function errg
-    rkill "Wallpapers.sh" && caelestia Wallpapers -f "/home/soufiane/Pictures/WALL/walls/astronaut.png"
-end
+# i use this so i don't override a file content 
+function add
+    echo $argv[1] >> $argv[2]
+end 
