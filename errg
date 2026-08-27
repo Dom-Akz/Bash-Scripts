@@ -1,3 +1,5 @@
 #!/usr/bin/env bash
 
-pgrep -f "Wallpapers.sh" && pkill -USR2 -f "Wallpapers.sh" && caelestia wallpaper -f ~/Pictures/WALL/walls/astronaut.png
+pgrep -f "Wallpapers.sh" && pkill -USR2 -f "Wallpapers.sh"
+
+caelestia wallpaper -f ~/Pictures/WALL/walls/voyager-11.jpg
