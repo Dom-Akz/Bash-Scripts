@@ -45,10 +45,6 @@ function bdu
     du -ah $argv[1] | sort -h | tail -n 2 | head -n 1
 end
 
-# wipe all disk 
-function format
-    sudo umount $argv[1] && dd bs=4M if=/dev/zero of=$argv[1] status=progress oflag=sync
-end
 
 # if don't want to permanently delete folder
 function dl
