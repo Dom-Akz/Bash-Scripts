@@ -2,7 +2,7 @@
 
 # calculate the change is disk (first run: current space disk, second run: print disk change)
 
-file="/home/soufiane/.local/share/cdc.txt"
+file="/home/soufiane/.local/share/cdc"
 
 if [ ! -f "$file" ] || [ ! -s "$file" ]; then
 	prev=$(df -B M /dev/nvme0n1p2 | awk '{printf $3}' | tr -d -c '0-9')
