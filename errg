@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 
 pgrep -f "Wallpapers.sh" && pkill -USR2 -f "Wallpapers.sh"
-
+systemctl --user stop Wallpapers.service
 caelestia wallpaper -f ~/Pictures/WALL/walls/voyager-11.jpg
