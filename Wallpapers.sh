@@ -88,6 +88,7 @@ log-to-file() {
 }
 
 init_wallpaper_list() {
+	echo "here"
 	find "$1" -type f \( -iname "*.png" -o -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.webp" -o -iname "*.webm" -o -iname "*.mp4" \) | shuf >"$LIST_FILE"
 	echo "0" >"$STATE_FILE"
 }
@@ -114,13 +115,13 @@ while getopts "v" opt; do
 	esac
 done
 
-[[ $avg == 1 ]] && {
+if [ $avg == 1 ]; then
 	WALL_DIR="$AVG_WALL"
 	init_wallpaper_list "$AVG_WALL"
 	info+=("The wallpaper is set to avg_wall to change it you need to terminate this instance and run another one without the -v option")
-}
-
-[ ! -f "$LIST_FILE" ] || [ ! -s "$LIST_FILE" ] && init_wallpaper_list "$MR_WALL"
+else
+	init_wallpaper_list "$MR_WALL"
+fi
 
 while true; do
 
