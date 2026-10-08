@@ -88,12 +88,21 @@ log-to-file() {
 }
 
 init_wallpaper_list() {
-	echo "here"
 	find "$1" -type f \( -iname "*.png" -o -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.webp" -o -iname "*.webm" -o -iname "*.mp4" \) | shuf >"$LIST_FILE"
 	echo "0" >"$STATE_FILE"
 }
 
+# rule: check if there is instance running
+ins=$(pgrep -fc "/home/soufiane/.local/bin/Wallpapers.sh")
+echo "$ins"
+if [ $ins -gt 1 ]; then
+	notify-send -a Wallpapers -i wallpaper-icon -u critical "Error: Stop all the others instancs befor running new one"
+	exit 1
+fi
+
 # init:
+# send notification to the user
+notify-send -a Wallpapers -i wallpaper-icon -u low "Starting the Walpapers app..."
 avg=0
 last_run=0
 WALL_DIR="$MR_WALL"
@@ -102,7 +111,7 @@ touch "$LOG_"
 systemctl --user restart Wallpapers.service
 
 # check if the script is running and get the start run time
-run_time=$(ps aux | grep .local/bin/changeWall.sh | awk 'NR==1 {print $9}')
+run_time=$(ps aux | grep "/home/soufiane/.local/bin/Wallpapers.sh" | awk 'NR==1 {print $9}')
 
 while getopts "v" opt; do
 	case "$opt" in
