@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 
-pgrep -f "Wallpapers.sh" && pkill -USR2 -f "Wallpapers.sh"
+pgrep -f "Wallpapers.sh" && pkill -USR2 -f "Wallpapers.sh" && notify-send -a Wallpapers -i wallpaper-icon -u low "Closing the wallpapers app"
 systemctl --user stop Wallpapers.service
-caelestia wallpaper -f ~/Pictures/WALL/walls/voyager-11.jpg
+caelestia wallpaper -f ~/Pictures/Wallpapers/Wall/Hyprland.png

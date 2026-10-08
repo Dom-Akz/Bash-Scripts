@@ -14,10 +14,10 @@ while inotifywait -e modify "$log"; do
 		if ! [ -z "$msg" ]; then
 			nb=$(echo "$msg" | cut -d: -f1 | tail -n 1)
 			# set the number of last error line
-			cn=$(echo "$msg" | wc -l)                                                                    # nombers of errors
-			msg=$(echo "$msg" | cut -d: -f2 | head -n 1)                                                 # get the first error message
-			notify-send -a Wallpapers -u normal "$msg"                                                   # send the first error occur in the file
-			[[ $cn -gt 1 ]] && notify-send -a Wallpapers -u low "There is $cn more error check log $log" # send info notif of how much error in the file
+			cn=$(echo "$msg" | wc -l)                                                                                      # nombers of errors
+			msg=$(echo "$msg" | cut -d: -f2 | head -n 1)                                                                   # get the first error message
+			notify-send -a Wallpapers -u normal "$msg"                                                                     # send the first error occur in the file
+			[[ $cn -gt 1 ]] && notify-send -a Wallpapers -i wallpaper-icon -u low "There is $cn more error check log $log" # send info notif of how much error in the file
 		fi
 
 	elif [ "$nb" != 0 ]; then
@@ -29,7 +29,7 @@ while inotifywait -e modify "$log"; do
 				nb="$new_nb"
 				if [ "$is_notfiy" -eq 0 ]; then
 					msg=$(echo "$line" | cut -d: -f2)
-					notify-send -a Wallpapers -u normal "$msg"
+					notify-send -a Wallpapers -i wallpaper-icon -u normal "$msg"
 					is_notfiy=1
 				fi
 			fi
