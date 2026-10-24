@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+
+# load lib (error msg)
+declare LIBRARY=${LIBRARY:-'/usr/share/makepkg'}
+source "$LIBRARY"/util/message.sh
+
+# helpers
+die() {
+    colorize
+    error "$@"
+    exit 1
+}
+
+check_cmd() {
+    if ! type -p "$1" &>/dev/null; then
+        return
+    else
+        die "$1 not found"
+    fi
+}
+
+get_wm() {
+    if ! [ -z "$XDG_CURRENT_DESKTOP" ]; then
+        vm=$(echo "$XDG_CURRENT_DESKTOP")
+    elif ! [ -z "$XDG_SESSION_TYPE" ]; then
+        vm=$(echo "$XDG_SESSION_TYPE")
+    fi
+}
+
+# get_cmd_by_wm(){}
+
+main() {
+    # ssh, tty
+    [[ -z "$DISPLAY" ]] && [[ -z "$WAYLAND_DISPLAY" ]] && die "no graphical session"
+
+    wm=""  # current window manager
+    cmd="" # tool use in the wm
+
+    # check which window manager the script is running on
+    wm=$(get_win_manger)
+    [[ -z "$wm" ]] && die "unkown window manager"
+
+    cmd=$(get_cmd_by_wm "$wm")
+    [[ -z "$cmd" ]] && die "no tool found (try finding which wallpaper tools are most use in $wm)"
+
+    check_cmd "$cmd"
+
+}
+
+"$@"

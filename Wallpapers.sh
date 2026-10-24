@@ -23,7 +23,7 @@ declare -r LONG=$(curl -s https://ipinfo.io/loc | cut -d, -f2)
 
 timeofday() {
 	local h=$(date +%H)
-	if [ "$h" -gt 7 ] && [ "$h" -lt 20 ]; then
+	if [ "$h" -gt 6 ] && [ "$h" -lt 20 ]; then
 		echo "morning"
 	else
 		echo "night"
@@ -61,7 +61,6 @@ isRain() {
 fem-time() {
 	# all the time btw :)
 	# so let's say at nigth (from 1:00 AM) ALL DAYYEES
-	day=$(date | awk '{printf $1}')
 	if [[ $(date +%H) -gt 1 ]] && [[ $(date +%H) -lt 5 ]]; then
 		return 0
 	else
@@ -74,16 +73,15 @@ log-to-file() {
 		echo -e "\n[$(date)]\n[ERROR] No information found" >>$LOG_
 	else
 		local dir="$1"
-		local header=""
-
 		local curr_wall="$2" # if the default wall
 		local -n arr=$3      # using the original array
+
 		local msg="[ERROR] NO MESSAGES WAS FOUND (hint: stop this instance and delete:
 		/tmp/wallpaper_state.txt, /tmp/wallpaper_list.txt)"
 
 		# check if the array is not empty
 		[[ "${#arr[@]}" -gt 0 ]] && msg=$(printf "%s\n" "${arr[@]}") # joined the array into a string
-		echo -e "\n$header\n[$(date)]\nWallpapers Directory: "$dir"\nCurrent Wallpaper: "$curr_wall"\n$msg" >>"$LOG_"
+		echo -e "\n[$(date)]\nWallpapers Directory: "$dir"\nCurrent Wallpaper: "$curr_wall"\n$msg" >>"$LOG_"
 	fi
 }
 
@@ -104,6 +102,7 @@ fi
 # send notification to the user
 notify-send -a Wallpapers -i wallpaper-icon -u low "Starting the Walpapers app..."
 avg=0
+fm=0
 last_run=0
 WALL_DIR="$MR_WALL"
 info=()
@@ -113,13 +112,16 @@ systemctl --user restart Wallpapers.service
 # check if the script is running and get the start run time
 run_time=$(ps aux | grep "/home/soufiane/.local/bin/Wallpapers.sh" | awk 'NR==1 {print $9}')
 
-while getopts "v" opt; do
+while getopts "vf" opt; do
 	case "$opt" in
 	v)
 		avg=1
 		;;
+	f)
+		fm=1
+		;;
 	*)
-		echo "use -v to set it to the avg wallpaper"
+		echo "YOO only -v and -f"
 		;;
 	esac
 done
@@ -128,6 +130,10 @@ if [ $avg == 1 ]; then
 	WALL_DIR="$AVG_WALL"
 	init_wallpaper_list "$AVG_WALL"
 	info+=("The wallpaper is set to avg_wall to change it you need to terminate this instance and run another one without the -v option")
+elif [ $fm == 1 ]; then
+	WALL_DIR="$FEM_WALL"
+	init_wallpaper_list "$FEM_WALL"
+	info+=("The wallpaper is set to fem_wall to change it you need to stop twinkiiing huhuhhh")
 else
 	init_wallpaper_list "$MR_WALL"
 fi
@@ -145,7 +151,7 @@ while true; do
 		run_time=""
 	fi
 	# skip if the script execute with -v option (no wall dir change)
-	if [ $avg == 0 ]; then
+	if [[ $avg -eq 0 && $fm -eq 0 ]]; then
 		# every hour
 		if [ $((current_time - last_run)) -ge 3600 ]; then
 

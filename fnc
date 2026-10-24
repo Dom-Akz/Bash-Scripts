@@ -20,7 +20,6 @@ get-cm() {
 
 # check if command line is valid (exists) or not
 check-cm() {
-	echo "$1"
 	if type -p "$(get-cm)" &>/dev/null; then
 		return
 	else
