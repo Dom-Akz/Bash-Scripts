@@ -1,49 +1,117 @@
 #!/usr/bin/env bash
 
+# GET THE CURRENT WALLPAPER
+# TODO: create a db (json) of all wallpaper setter and the path to conf file or the sub-command, use to get the wall
+
 # load lib (error msg)
 declare LIBRARY=${LIBRARY:-'/usr/share/makepkg'}
 source "$LIBRARY"/util/message.sh
 
 # helpers
 die() {
-    colorize
-    error "$@"
-    exit 1
+	colorize
+	error "$@"
+	exit 1
 }
 
 check_cmd() {
-    if ! type -p "$1" &>/dev/null; then
-        return
-    else
-        die "$1 not found"
-    fi
+	if ! type -p "$cmd" &>/dev/null; then
+		return
+	else
+		die "$cmd not found"
+	fi
 }
 
 get_wm() {
-    if ! [ -z "$XDG_CURRENT_DESKTOP" ]; then
-        vm=$(echo "$XDG_CURRENT_DESKTOP")
-    elif ! [ -z "$XDG_SESSION_TYPE" ]; then
-        vm=$(echo "$XDG_SESSION_TYPE")
-    fi
+	if ! [ -z "$XDG_CURRENT_DESKTOP" ]; then
+		wm=$(echo "$XDG_CURRENT_DESKTOP")
+	elif ! [ -z "$XDG_SESSION_TYPE" ]; then
+		wm=$(echo "$XDG_SESSION_TYPE")
+	fi
 }
 
-# get_cmd_by_wm(){}
+get_cmd_by_wm() {
+	case "${wm,,}" in
+	*gnome* | *budgie* | *unity*) tools=(gsettings dconf gnome-control-center) ;;
+	*cinnamon*) tools=(gsettings dconf cinnamon-settings) ;;
+	*mate*) tools=(gsettings dconf mate-appearance-properties) ;;
+	*kde* | *plasma*) tools=(plasma-apply-wallpaperimage qdbus systemsettings) ;;
+	*xfce*) tools=(xfconf-query xfdesktop xfdesktop-settings) ;;
+	*lxqt*) tools=(pcmanfm-qt feh nitrogen) ;;
+	*hyprland*) tools=(hyprpaper swww swaybg) ;;
+	*sway*) tools=(swaybg swww swaymsg) ;;
+	*fluxbox*) tools=(fbsetbg feh nitrogen) ;;
+	*) tools=(feh nitrogen xwallpaper) ;; # i3, bspwm, dwm, openbox, awesome, qtile, unknown
+	esac
+}
+
+get_curr_wall() {
+	curr_wall=""
+	local t
+	for t in "${tools[@]}"; do
+		[[ ! $(check_cmd $t) ]] && continue
+		case "$t" in
+		gsettings)
+			case "${wm,,}" in
+			*cinnamon*) curr_wall=$(gsettings get org.cinnamon.desktop.background picture-uri) ;;
+			*mate*) curr_wall=$(gsettings get org.mate.background picture-filename) ;;
+			*) curr_wall=$(gsettings get org.gnome.desktop.background picture-uri) ;;
+			esac
+			;;
+		dconf)
+			case "${wm,,}" in
+			*cinnamon*) curr_wall=$(dconf read /org/cinnamon/desktop/background/picture-uri) ;;
+			*mate*) curr_wall=$(dconf read /org/mate/desktop/background/picture-filename) ;;
+			*) curr_wall=$(dconf read /org/gnome/desktop/background/picture-uri) ;;
+			esac
+			;;
+		xfconf-query)
+			curr_wall=$(xfconf-query -c xfce4-desktop -l | grep 'last-image$' | head -1 |
+				xargs xfconf-query -c xfce4-desktop -p)
+			;;
+		qdbus)
+			curr_wall=$(qdbus org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript \
+				'var d=desktops(); for (var i=0;i<d.length;i++){ d[i].currentConfigGroup=["Wallpaper","org.kde.image","General"]; print(d[i].readConfig("Image")); }' |
+				head -1)
+			;;
+		swww)
+			curr_wall=$(swww query | head -1 | sed 's/.*image: //')
+			;;
+		hyprpaper)
+			curr_wall=$(hyprctl -q hyprpaper listactive | head -1 | sed 's/.*= *//')
+			;;
+		*) continue ;; # no getter for this tool
+		esac
+
+		[ -n "$curr_wall" ] && return 0
+
+	done
+	return 1
+}
 
 main() {
-    # ssh, tty
-    [[ -z "$DISPLAY" ]] && [[ -z "$WAYLAND_DISPLAY" ]] && die "no graphical session"
+	# ssh, tty
+	[[ -z "$DISPLAY" ]] && [[ -z "$WAYLAND_DISPLAY" ]] && die "no graphical session"
 
-    wm=""  # current window manager
-    cmd="" # tool use in the wm
+	wm=""    # current window manager
+	tools=() # array hold the 3 most use wallpapers tools in the given window manager
+	curr_wall=""
 
-    # check which window manager the script is running on
-    wm=$(get_win_manger)
-    [[ -z "$wm" ]] && die "unkown window manager"
+	# check which window manager the script is running on
+	get_win_manger
+	[[ -z "$wm" ]] && die "unkown window manager"
 
-    cmd=$(get_cmd_by_wm "$wm")
-    [[ -z "$cmd" ]] && die "no tool found (try finding which wallpaper tools are most use in $wm)"
+	get_cmd_by_wm
 
-    check_cmd "$cmd"
+	[[ -z "$cmd" ]] && die "no tool found (try finding which wallpaper tools are most use in $wm)"
+
+	# get current wallpaper (only work if the tools use have a getter)
+	if get_cmd_by_wm; then
+		echo "$curr_wall"
+		#notify-send "$curr_wall"
+		exit 0
+	fi
+	# find it in conf files
 
 }
 
