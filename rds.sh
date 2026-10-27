@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 DIR="$HOME/Music/Record/"
+
 [[ ! -d $DIR ]] && exit 1
 
 size=0
@@ -13,7 +14,6 @@ set_size() {
 
 while :; do
 	set_size
-	echo "$n_size"
 	[[ $n_size -gt 100 ]] && notify-send -u critical "$DIR grew by more than 100 MB"
 	sleep 350
 done
