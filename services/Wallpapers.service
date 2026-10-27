@@ -1,0 +1,5 @@
+[Unit]
+Description="Monitor Wallpapers.sh logs activity"
+
+[Service]
+ExecStart=/home/soufiane/.local/bin/mlg.sh

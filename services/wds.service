@@ -1,0 +1,8 @@
+[Unit]
+Description=Record folder size watcher
+BindsTo=arec.service
+After=arec.service
+
+[Service]
+ExecStart=/home/soufiane/.local/bin/rds.sh
+
