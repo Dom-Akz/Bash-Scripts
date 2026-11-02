@@ -4,5 +4,5 @@ BindsTo=arec.service
 After=arec.service
 
 [Service]
-ExecStart=/home/soufiane/.local/bin/rds.sh
+ExecStart=/home/soufiane/.local/bin/wds.sh
 

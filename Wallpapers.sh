@@ -94,13 +94,13 @@ init_wallpaper_list() {
 ins=$(pgrep -fc "/home/soufiane/.local/bin/Wallpapers.sh")
 echo "$ins"
 if [ $ins -gt 1 ]; then
-	notify-send -a Wallpapers -i wallpaper-icon -u critical "Error: Stop all the others instancs befor running new one"
+	notify-send -a Wallpapers -i wallpaper-icon -u critical "Error" "Stop all the others instancs befor running new one"
 	exit 1
 fi
 
 # init:
 # send notification to the user
-notify-send -a Wallpapers -i wallpaper-icon -u low "Starting the Walpapers app..."
+notify-send -a Wallpapers -i wallpaper-icon -u low "Info" "Starting the Walpapers app..."
 avg=0
 fm=0
 last_run=0
