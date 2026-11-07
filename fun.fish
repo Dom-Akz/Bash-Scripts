@@ -22,24 +22,16 @@ function rmp
     set PATH (string match -v $argv[1] $PATH)
 end
 
-# add path to $PATH
-function adp
-   set -U fish_user_paths $argv[1]
-end
-
-# search process
-function p 
-    ps aux | grep $argv[1]
-end
 
 # dir owner
 function own
     ls -ld $argv[1] | awk '{print $3}'
+
 end
 
 # find all process (by name) and kill all instance
 function rkill
-    pgrep -f $argv[1] && pkill -USR2 -f $argv[1] &&  systemctl --user stop Wallpapers.service 
+    pgrep -f $argv[1] && pkill -USR2 -f $argv[1] 
 end
 
 # largest file with it a directory (TODO: or sub-dirctorys)
@@ -47,16 +39,6 @@ function bdu
     du -ah $argv[1] | sort -h | tail -n 2 | head -n 1
 end
 
-
-# if don't want to permanently delete folder
-function dl
-    mv $argv[1] ~/Trash/
-end
-
-# list content sort by last changed
-function lsc
-    ls -r -s=changed $argv[1]
-end
 
 # convert to pdf
 function topdf
@@ -72,7 +54,7 @@ function dec
      openssl enc -d -aes-256-cbc -pbkdf2 -in $argv[1] -out $argv[2] 
 end
 
-# i use this so i don't override a file content 
+# i use this so i don't override the file
 function add
     echo $argv[1] >> $argv[2]
 end 
