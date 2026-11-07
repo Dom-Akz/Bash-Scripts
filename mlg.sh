@@ -3,7 +3,7 @@
 # monitor a log file and send notifications if any new error occur in log
 
 # path to the log file (if the path is worng inotifywait will raise the error)
-log="/home/soufiane/.local/share/chwall/Wallpapers-$(date +%d-%m-%y).log"
+log="/home/soufiane/.local/share/chwall/Wallpapers-01-11-26.log"
 
 nb=0 # hold the last error line number
 
