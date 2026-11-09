@@ -23,7 +23,7 @@ declare -r LONG=$(curl -s https://ipinfo.io/loc | cut -d, -f2)
 
 timeofday() {
 	local h=$(date +%H)
-	if [ "$h" -gt 6 ] && [ "$h" -lt 20 ]; then
+	if [ "$h" -gt 6 ] && [ "$h" -lt 19 ]; then
 		echo "morning"
 	else
 		echo "night"
@@ -37,7 +37,7 @@ isHot() {
 	if [ -z "$deg" ] || [ "$deg" == "null" ]; then
 		return 1
 	fi
-	deg=$(printf "%.0f" "$deg")
+	local deg=$(printf "%.0f" "$deg")
 	if [ $deg -gt 27 ]; then
 		return 0 # hot day
 	else
